@@ -1,0 +1,4 @@
+pumukit_paella_stats:
+    resource: "@PumukitPaellaStatsBundle/Controller/"
+    type:     annotation
+    prefix:   /
