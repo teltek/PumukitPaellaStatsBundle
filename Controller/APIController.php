@@ -9,6 +9,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Pumukit\PaellaStatsBundle\Document\UserAction;
 
 
 /**
@@ -18,48 +20,47 @@ class APIController extends Controller
 {
 
 	/**
-     * @Route("/group")
+     * @Route("/group/{idVideo}")
      * @Method("POST")
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")
      */
-    public function groupSaveAction(Request $request)
+    public function groupSaveAction(Request $request, $idVideo)
     {
 
-        $id = $request->get('id');
         $intervals = $request->get('intervals');
         $isLive = $request->get('isLive');
-        $ip = $this->container->get('request')->getClientIp();
+        
+        if (is_array($intervals) && $idVideo){
+            foreach ($intervals as $interval){
+                if($interval['in'] && $interval['out']){
+                    $this->saveAction($idVideo, $interval['in'], $interval['out'], $isLive);
+                }
+            }
+        }
 
         return new JsonResponse(
             array(
-                    'id' => $id,
-                    'intervals' => $intervals,
-                    'isLive' => $isLive,
-                    'ip' => $ip
+                    'id' => $idVideo
                 )
             );
     }
 
 
     /**
-     * @Route("/single")
+     * @Route("/single/{idVideo}")
      * @Method("POST")
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")
      */
-    public function singleSaveAction(Request $request)
+    public function singleSaveAction(Request $request, $idVideo)
     {
 
-        $id = $request->get('id');
-        $in = $request->get('in');
-        $out = $request->get('out');
-		$ip = $this->container->get('request')->getClientIp();
+        if($idVideo){
+            $this->saveAction($idVideo, $request->get('in'), $request->get('out'), $request->get('isLive'));
+        }
 
         return new JsonResponse(
             array(
-                    'id' => $id,
-                    'in' => $in,
-                    'out' => $out,
-                    'ip' => $ip
+                    'id' => $idVideo
                 )
             );
     }
@@ -75,4 +76,19 @@ class APIController extends Controller
         return new Response("hello world!");
     }
 
+
+
+    private function saveAction($multimediaObject, $in, $out, $isLive = false){
+
+        $ip = $this->container->get('request')->getClientIp();
+        $user = ($this->getUser()) ? $this->getUser()->getId() : null;
+        $session = new Session(); 
+        $session = $session->getId();
+
+        $userAction = new UserAction($ip, $session, $multimediaObject, $in, $out, 0, $user);
+
+        $dm = $this->get('doctrine_mongodb')->getManager();
+        $dm->persist($userAction);
+        $dm->flush();
+    }
 }

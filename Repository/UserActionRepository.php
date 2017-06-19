@@ -1,5 +1,5 @@
 <?php
-namespace Pumukit\StatsBundle\Repository;
+namespace Pumukit\PaellaStatsBundle\Repository;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
 /**

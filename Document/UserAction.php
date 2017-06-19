@@ -1,5 +1,6 @@
 <?php
 namespace Pumukit\PaellaStatsBundle\Document;
+
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
