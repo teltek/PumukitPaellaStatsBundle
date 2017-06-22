@@ -2,6 +2,7 @@
 namespace Pumukit\PaellaStatsBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints\False;
 
 /**
  * Pumukit\PaellaStatsBundle\Document\UserAction.
@@ -44,6 +45,13 @@ class UserAction
      * @MongoDB\String
      */
     private $session;
+
+    /**
+     * @var string
+     *
+     * @MongoDB\String
+     */
+    private $userAgent;
     
 	/**
      * @var string
@@ -73,11 +81,12 @@ class UserAction
      */
     private $isLive;
 	
-    public function __construct($ip, $session, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
+    public function __construct($ip, $session, $userAgent, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
     {
         $this->date = new \DateTime('now');
         $this->ip = $ip;
         $this->session = $session;
+        $this->userAgent = $userAgent;
         $this->multimediaObject = $multimediaObject;
         $this->inPoint = $inPoint;
         $this->outPoint = $outPoint;
@@ -163,7 +172,30 @@ class UserAction
     {
         return $this->session;
     }
-    
+
+    /**
+     * Set userAgent.
+     *
+     * @param string $userAgent
+     *
+     * @return self
+     */
+    public function setUserAgent($userAgent)
+    {
+        $this->userAgent = $userAgent;
+        return $this;
+    }
+
+    /**
+     * Get session.
+     *
+     * @return string $userAgent
+     */
+    public function getUserAgent()
+    {
+        return $this->userAgent;
+    }
+
 	/**
      * Set multimediaObject.
      *

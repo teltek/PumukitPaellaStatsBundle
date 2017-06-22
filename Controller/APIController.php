@@ -28,7 +28,7 @@ class APIController extends Controller
     {
 
         $intervals = $request->get('intervals');
-        $isLive = $request->get('isLive');
+        $isLive = json_decode($request->get('isLive'));
         
         if (is_array($intervals) && $idVideo){
             foreach ($intervals as $interval){
@@ -78,14 +78,15 @@ class APIController extends Controller
 
 
 
-    private function saveAction($multimediaObject, $in, $out, $isLive = false){
+    private function saveAction($multimediaObject, $in, $out, $isLive){
 
         $ip = $this->container->get('request')->getClientIp();
+        $userAgent = $this->container->get('request')->headers->get('User-Agent');
         $user = ($this->getUser()) ? $this->getUser()->getId() : null;
         $session = new Session(); 
         $session = $session->getId();
 
-        $userAction = new UserAction($ip, $session, $multimediaObject, $in, $out, 0, $user);
+        $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $in, $out, False, $user);
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
