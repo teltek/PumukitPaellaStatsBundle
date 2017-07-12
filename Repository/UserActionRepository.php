@@ -10,4 +10,5 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
  */
 class UserActionRepository extends DocumentRepository
 {
+
 }
