@@ -92,6 +92,34 @@ class UserActionService
 
     }
 
+<<<<<<< HEAD
+=======
+    public function getMostUsedBrowser(array $criteria = array(), array $options = array())
+    {
+
+        $ids = array();
+
+        $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+
+        $options = $this->parseOptions($options);
+
+        $pipeline = array();
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
+
+        $pipeline[] = array('$group' => array("_id" => '$userAgent', "session_list" => array('$addToSet' => '$session')));
+        $pipeline[] = array('$project' => array("_id" => 1, 'numUses' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("numUses" => -1));
+
+        $aggregation = $viewsCollection->aggregate($pipeline);
+
+        $total = count($aggregation);
+        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
+
+        return array($aggregation, $total);
+
+    }
+
+>>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
     /**
      * Returns an array of MongoIds as results from the criteria.
      */

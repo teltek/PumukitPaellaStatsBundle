@@ -20,7 +20,11 @@ use Pumukit\PaellaStatsBundle\Document\UserAction;
 class APIController extends Controller
 {
 
+<<<<<<< HEAD
 	/**
+=======
+    /**
+>>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
      * @Route("/group/{idVideo}")
      * @Method("POST")
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")
@@ -56,7 +60,11 @@ class APIController extends Controller
     {
 
         if($idVideo){
+<<<<<<< HEAD
             $this->saveAction($idVideo, $request->get('in'), $request->get('out'));
+=======
+            $this->saveAction($request, $idVideo, $request->get('in'), $request->get('out'));
+>>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
         }
 
         return new JsonResponse(
@@ -117,6 +125,47 @@ class APIController extends Controller
 
 
 
+<<<<<<< HEAD
+=======
+    /**
+     * @Route("/most_used_browser.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Method("GET")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     */
+    public function mostUsedBrowserAction(Request $request)
+    {
+        $serializer = $this->get('serializer');
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
+        list($criteria, $sort, $fromDate, $toDate, $limit, $page) = $this->processRequestData($request);
+
+        $options['from_date'] = $fromDate;
+        $options['to_date'] = $toDate;
+        $options['limit'] = $limit;
+        $options['page'] = $page;
+        $options['sort'] = $sort;
+
+        list($mostViewed, $total) = $viewsService->getMostUsedBrowser($criteria, $options);
+
+        $views = array(
+            'limit' => $limit,
+            'page' => $page,
+            'total' => $total,
+            'criteria' => $criteria,
+            'sort' => $sort,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+            'm_viewed' => $mostViewed,
+        );
+
+        $data = $serializer->serialize($views, $request->getRequestFormat());
+
+        return new Response($data);
+    }
+
+
+
+>>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
     private function saveAction(Request $request, $multimediaObject, $in, $out){
 
         $ip = $request->getClientIp();
@@ -165,4 +214,24 @@ class APIController extends Controller
 
         return array($criteria, $sort, $fromDate, $toDate, $limit, $page);
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+>>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
