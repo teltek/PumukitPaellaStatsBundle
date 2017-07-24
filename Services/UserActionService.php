@@ -92,8 +92,7 @@ class UserActionService
 
     }
 
-<<<<<<< HEAD
-=======
+
     public function getMostUsedBrowser(array $criteria = array(), array $options = array())
     {
 
@@ -119,7 +118,7 @@ class UserActionService
 
     }
 
->>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
+
     /**
      * Returns an array of MongoIds as results from the criteria.
      */
