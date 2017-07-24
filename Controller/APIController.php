@@ -1,8 +1,7 @@
 <?php
 
 namespace Pumukit\PaellaStatsBundle\Controller;
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +19,7 @@ use Pumukit\PaellaStatsBundle\Document\UserAction;
 class APIController extends Controller
 {
 
-<<<<<<< HEAD
-	/**
-=======
     /**
->>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
      * @Route("/group/{idVideo}")
      * @Method("POST")
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")
@@ -60,11 +55,7 @@ class APIController extends Controller
     {
 
         if($idVideo){
-<<<<<<< HEAD
-            $this->saveAction($idVideo, $request->get('in'), $request->get('out'));
-=======
             $this->saveAction($request, $idVideo, $request->get('in'), $request->get('out'));
->>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
         }
 
         return new JsonResponse(
@@ -125,8 +116,6 @@ class APIController extends Controller
 
 
 
-<<<<<<< HEAD
-=======
     /**
      * @Route("/most_used_browser.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
@@ -165,7 +154,6 @@ class APIController extends Controller
 
 
 
->>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
     private function saveAction(Request $request, $multimediaObject, $in, $out){
 
         $ip = $request->getClientIp();
@@ -214,24 +202,4 @@ class APIController extends Controller
 
         return array($criteria, $sort, $fromDate, $toDate, $limit, $page);
     }
-<<<<<<< HEAD
 }
-=======
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> feature/10_create_the_Action_to_obtain_most_used_browsers
