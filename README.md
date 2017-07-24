@@ -36,10 +36,4 @@ $ php app/console cache:clear
 $ php app/console cache:clear --env=prod
 $ php app/console assets:install
 ```
-### Note:
-* You need to create a link to the bundle configuration file in "app/config/routing.yml"
-```
-pumukit_paella_stats:
-    resource: "@PumukitPaellaStatsBundle/Resources/config/routing.yml"
-    prefix:   /
-```
+
