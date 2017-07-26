@@ -80,6 +80,14 @@ class UserAction
      * @MongoDB\Boolean
      */
     private $isLive;
+
+    /**
+     * @var Geolocation
+     *
+     * @MongoDB\EmbedOne(targetDocument="Geolocation")
+     */
+    private $location;
+
 	
     public function __construct($ip, $session, $userAgent, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
     {
@@ -309,5 +317,26 @@ class UserAction
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set location.
+     *
+     * @param Geolocation $location
+     */
+    public function setLocation(Geolocation $location)
+    {
+        $this->location = $location;
+        return $this;
+    }
+    
+    /**
+     * Get location.
+     *
+     * @return Geolocation $location
+     */
+    public function getLocation()
+    {
+        return $this->location;
     }
 }

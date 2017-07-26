@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
+use Pumukit\PaellaStatsBundle\Document\Geolocation;
 
 
 /**
@@ -160,6 +161,23 @@ class APIController extends Controller
         $isLive = json_decode($request->get('isLive'));
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $in, $out, $isLive, $user);
+
+        $record = $this->get('geoip2.reader')->city($ip);
+
+        $userLocation = new Geolocation();
+        $userLocation->setContinent( $record->continent->name);
+        $userLocation->setIsoContinent($record->continent->code);
+        $userLocation->setCountry($record->country->name);
+        $userLocation->setIsoCountry($record->country->isoCode);
+        $userLocation->setSubCountry($record->mostSpecificSubdivision->name);
+        $userLocation->setIsoSubCountry($record->mostSpecificSubdivision->isoCode);
+        $userLocation->setCity($record->city->name);
+        $userLocation->setLatitude($record->location->latitude);
+        $userLocation->setLongitude($record->location->longitude);
+        $userLocation->setTimeZone($record->location->timeZone);
+        $userLocation->setPostal($record->postal->code);
+
+        $userAction->setLocation($userLocation);
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
