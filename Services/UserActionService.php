@@ -38,8 +38,8 @@ class UserActionService
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
 
         $pipeline[] = array('$group' => array("_id" => '$multimediaObject', "session_list" => array('$addToSet' => '$session')));
-        $pipeline[] = array('$project' => array("_id" => 1, 'numView' => array('$size' => '$session_list')));
-        $pipeline[] = array('$sort' => array("numView" => -1));
+        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("num_viewed" => -1));
 
         $aggregation = $viewsCollection->aggregate($pipeline);
 
@@ -53,9 +53,9 @@ class UserActionService
             $multimediaObject = $this->repoMultimedia->find($element['_id']);
             if ($multimediaObject) {
                 $mostViewed[] = array('mmobj' => $multimediaObject,
-                    'num_viewed' => $element['numView'],
+                    'num_viewed' => $element['num_viewed'],
                 );
-                $total += $element['numView'];
+                $total += $element['num_viewed'];
             }
         }
 
@@ -95,9 +95,6 @@ class UserActionService
 
     public function getMostUsedBrowser(array $criteria = array(), array $options = array())
     {
-
-        $ids = array();
-
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
 
         $options = $this->parseOptions($options);
@@ -106,8 +103,8 @@ class UserActionService
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
 
         $pipeline[] = array('$group' => array("_id" => '$userAgent', "session_list" => array('$addToSet' => '$session')));
-        $pipeline[] = array('$project' => array("_id" => 1, 'numUses' => array('$size' => '$session_list')));
-        $pipeline[] = array('$sort' => array("numUses" => -1));
+        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("num_viewed" => -1));
 
         $aggregation = $viewsCollection->aggregate($pipeline);
 
@@ -116,6 +113,42 @@ class UserActionService
 
         return array($aggregation, $total);
 
+    }
+
+    public function getCityFromMostViewed (array $criteria = array(), array $options = array())
+    {
+        $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+
+        $options = $this->parseOptions($options);
+
+        $pipeline = array();
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
+
+        $pipeline[] = array('$group' => array(
+            "_id" => array(
+                'continent' => '$geolocation.continent',
+                'continent_code' => '$geolocation.continentCode',
+                'country' => '$geolocation.country',
+                'country_code' => '$geolocation.countryCode',
+                'sub_country' => '$geolocation.subCountry',
+                'sub_country_code' => '$geolocation.subCountryCode',
+                'city' => '$geolocation.city',
+                //'latitude' => '$geolocation.location.latitude',
+                //'longitude' => '$geolocation.location.longitude',
+                //'time_zone' => '$geolocation.location.timeZone',
+                //'postal' => '$geolocation.postal'
+            ),
+            "session_list" => array('$addToSet' => '$session'))
+        );
+        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("num_viewed" => -1));
+
+        $aggregation = $viewsCollection->aggregate($pipeline);
+
+        $total = count($aggregation);
+        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
+
+        return array($aggregation, $total);
     }
 
 

@@ -31,7 +31,7 @@ class Geolocation
      *
      * @MongoDB\String
      */
-    private $isoContinent;
+    private $continentCode;
     
 	/**
      * @var string
@@ -45,7 +45,7 @@ class Geolocation
      *
      * @MongoDB\String
      */
-    private $isoCountry;
+    private $countryCode;
     
     /**
      * @var string
@@ -59,7 +59,7 @@ class Geolocation
      *
      * @MongoDB\String
      */
-    private $isoSubCountry;
+    private $subCountryCode;
 
     /**
      * @var string
@@ -117,26 +117,26 @@ class Geolocation
     }
     
     /**
-     * Set isoContinent.
+     * Set continentCode.
      *
-     * @param string $isoContinent
+     * @param string $continentCode
      *
      * @return self
      */
-    public function setIsoContinent($isoContinent)
+    public function setContinentCode($continentCode)
     {
-        $this->isoContinent = $isoContinent;
+        $this->continentCode = $continentCode;
         return $this;
     }
     
 	/**
-     * Get isoContinent.
+     * Get continentCode.
      *
-     * @return string $isoContinent
+     * @return string $continentCode
      */
-    public function getIsoContinent()
+    public function getContinentCode()
     {
-        return $this->isoContinent;
+        return $this->continentCode;
     }
     
 	/**
@@ -163,26 +163,26 @@ class Geolocation
     }
 
     /**
-     * Set isoCountry.
+     * Set countryCode.
      *
-     * @param string $isoCountry
+     * @param string $countryCode
      *
      * @return self
      */
-    public function setIsoCountry($isoCountry)
+    public function setCountryCode($countryCode)
     {
-        $this->isoCountry = $isoCountry;
+        $this->countryCode = $countryCode;
         return $this;
     }
 
     /**
-     * Get isoCountry.
+     * Get countryCode.
      *
-     * @return string $isoCountry
+     * @return string $countryCode
      */
-    public function getIsoCountry()
+    public function getCountryCode()
     {
-        return $this->isoCountry;
+        return $this->countryCode;
     }
 
 	/**
@@ -209,26 +209,26 @@ class Geolocation
     }
 	
 	/**
-     * Set isoSubCountry.
+     * Set subCountryCode.
      *
-     * @param string $isoSubCountry
+     * @param string $subCountryCode
      *
      * @return self
      */
-    public function setIsoSubCountry($isoSubCountry)
+    public function setSubCountryCode($subCountryCode)
     {
-        $this->isoSubCountry = $isoSubCountry;
+        $this->subCountryCode = $subCountryCode;
         return $this;
     }
 	
 	/**
-     * Get isoSubCountry.
+     * Get subCountryCode.
      *
-     * @return string $isoSubCountry
+     * @return string $subCountryCode
      */
-    public function getIsoSubCountry()
+    public function getSubCountryCode()
     {
-        return $this->isoSubCountry;
+        return $this->subCountryCode;
     }
 	
 	/**

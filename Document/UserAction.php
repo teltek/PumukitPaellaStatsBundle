@@ -86,7 +86,7 @@ class UserAction
      *
      * @MongoDB\EmbedOne(targetDocument="Geolocation")
      */
-    private $location;
+    private $geolocation;
 
 	
     public function __construct($ip, $session, $userAgent, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
@@ -320,23 +320,23 @@ class UserAction
     }
 
     /**
-     * Set location.
+     * Set geolocation.
      *
-     * @param Geolocation $location
+     * @param Geolocation $geolocation
      */
-    public function setLocation(Geolocation $location)
+    public function setGeolocation(Geolocation $geolocation)
     {
-        $this->location = $location;
+        $this->geolocation = $geolocation;
         return $this;
     }
     
     /**
-     * Get location.
+     * Get geolocation.
      *
-     * @return Geolocation $location
+     * @return Geolocation $geolocation
      */
-    public function getLocation()
+    public function getGeolocation()
     {
-        return $this->location;
+        return $this->geolocation;
     }
 }
