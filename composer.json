@@ -13,7 +13,7 @@
         "php": ">=5.5.9",
         "teltek/pmk2-paella-player-bundle": ">=1.2",
         "pumukit/pumukit2": ">=2.2",
-        "willdurand/geocoder-bundle": "^4.0"
+        "gpslab/geoip2": "^1.0"
     },
     "homepage": "https://github.com/teltek/PuMuKIT2-paella-stats-bundle",
     "license": "Copyright",
@@ -27,5 +27,13 @@
         "psr-4": {
             "Pumukit\\PaellaStatsBundle\\": ""
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "GpsLab\\Bundle\\GeoIP2Bundle\\Composer\\ScriptHandler::updateDatabase"
+        ],
+        "post-update-cmd": [
+            "GpsLab\\Bundle\\GeoIP2Bundle\\Composer\\ScriptHandler::updateDatabase"
+        ]
     }
 }

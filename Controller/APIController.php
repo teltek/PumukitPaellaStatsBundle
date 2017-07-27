@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
+use Pumukit\PaellaStatsBundle\Document\Geolocation;
 
 
 /**
@@ -130,7 +131,43 @@ class APIController extends Controller
         $options['page'] = $page;
         $options['sort'] = $sort;
 
-        list($mostViewed, $total) = $viewsService->getMostUsedBrowser($criteria, $options);
+        list($mostUsed, $total) = $viewsService->getMostUsedBrowser($criteria, $options);
+
+        $views = array(
+            'limit' => $limit,
+            'page' => $page,
+            'total' => $total,
+            'criteria' => $criteria,
+            'sort' => $sort,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+            'm_used' => $mostUsed,
+        );
+
+        $data = $serializer->serialize($views, $request->getRequestFormat());
+
+        return new Response($data);
+    }
+
+    /**
+     * @Route("/city_from_most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Method("GET")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     */
+    public function cityFromMostViewedAction(Request $request)
+    {
+        $serializer = $this->get('serializer');
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
+        list($criteria, $sort, $fromDate, $toDate, $limit, $page) = $this->processRequestData($request);
+
+        $options['from_date'] = $fromDate;
+        $options['to_date'] = $toDate;
+        $options['limit'] = $limit;
+        $options['page'] = $page;
+        $options['sort'] = $sort;
+
+        list($mostViewed, $total) = $viewsService->getCityFromMostViewed($criteria, $options);
 
         $views = array(
             'limit' => $limit,
@@ -148,8 +185,6 @@ class APIController extends Controller
         return new Response($data);
     }
 
-
-
     private function saveAction(Request $request, $multimediaObject, $in, $out){
 
         $ip = $request->getClientIp();
@@ -160,6 +195,23 @@ class APIController extends Controller
         $isLive = json_decode($request->get('isLive'));
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $in, $out, $isLive, $user);
+
+        $record = $this->get('geoip2.reader')->city($ip);
+
+        $userGeolocation = new Geolocation();
+        $userGeolocation->setContinent( $record->continent->name);
+        $userGeolocation->setContinentCode($record->continent->code);
+        $userGeolocation->setCountry($record->country->name);
+        $userGeolocation->setCountryCode($record->country->isoCode);
+        $userGeolocation->setSubCountry($record->mostSpecificSubdivision->name);
+        $userGeolocation->setSubCountryCode($record->mostSpecificSubdivision->isoCode);
+        $userGeolocation->setCity($record->city->name);
+        $userGeolocation->setLatitude($record->location->latitude);
+        $userGeolocation->setLongitude($record->location->longitude);
+        $userGeolocation->setTimeZone($record->location->timeZone);
+        $userGeolocation->setPostal($record->postal->code);
+
+        $userAction->setGeolocation($userGeolocation);
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
