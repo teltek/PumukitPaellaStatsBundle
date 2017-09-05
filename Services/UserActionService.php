@@ -102,6 +102,10 @@ class UserActionService
         $pipeline = array();
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
 
+        if(isset($criteria) and isset($criteria['id']) and 0 != count($criteria)) {
+            $pipeline[] = array('$match' => array('multimediaObject' => new \MongoId($criteria['id'])));
+        }
+
         $pipeline[] = array('$group' => array("_id" => '$userAgent', "session_list" => array('$addToSet' => '$session')));
         $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
         $pipeline[] = array('$sort' => array("num_viewed" => -1));
@@ -124,6 +128,10 @@ class UserActionService
         $pipeline = array();
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
 
+        if(isset($criteria) and isset($criteria['id']) and 0 != count($criteria)) {
+            $pipeline[] = array('$match' => array('multimediaObject' => new \MongoId($criteria['id'])));
+        }
+
         $pipeline[] = array('$group' => array(
             "_id" => array(
                 'continent' => '$geolocation.continent',
@@ -140,6 +148,7 @@ class UserActionService
             ),
             "session_list" => array('$addToSet' => '$session'))
         );
+
         $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
         $pipeline[] = array('$sort' => array("num_viewed" => -1));
 
