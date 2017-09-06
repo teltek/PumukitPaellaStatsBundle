@@ -88,7 +88,14 @@ class UserAction
      */
     private $geolocation;
 
-	
+    /**
+     * @var bool
+     *
+     * @MongoDB\Boolean
+     */
+    private $isProcessed;
+
+
     public function __construct($ip, $session, $userAgent, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
     {
         $this->date = new \DateTime('now');
@@ -100,6 +107,7 @@ class UserAction
         $this->outPoint = $outPoint;
         $this->isLive = $isLive;
         $this->user = $user;
+        $this->isProcessed = false;
     }
 	
     /**
@@ -338,5 +346,26 @@ class UserAction
     public function getGeolocation()
     {
         return $this->geolocation;
+    }
+
+    /**
+     * Set isProcessed.
+     *
+     * @param bool $isProcessed
+     */
+    public function setIsProcessed($isProcessed)
+    {
+        $this->isProcessed = $isProcessed;
+        return $this;
+    }
+
+    /**
+     * Get isProcessed.
+     *
+     * @return bool $isProcessed
+     */
+    public function getIsProcessed()
+    {
+        return $this->isProcessed;
     }
 }
