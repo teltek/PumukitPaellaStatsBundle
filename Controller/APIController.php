@@ -65,6 +65,30 @@ class APIController extends Controller
 
 
     /**
+     * @Route("/process_analytics.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Method("GET")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     */
+    public function processAnalyticsAction(Request $request)
+    {
+        $serializer = $this->get('serializer');
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
+        list($processed, $total) = $viewsService->getUnprocessedUserAction();
+
+        $log = array(
+            'processed' => $processed,
+            'total' => $total,
+            'date' => new \DateTime('now')
+        );
+
+        $data = $serializer->serialize($log, $request->getRequestFormat());
+
+        return new Response($data);
+    }
+
+
+    /**
      * @Route("/test.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")

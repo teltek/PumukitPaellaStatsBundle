@@ -10,17 +10,23 @@ class UserActionService
     private $dm;
     private $repo;
     private $repoMultimedia;
-    private $repoSeries;
+    private $repoAnalytics;
 
     public function __construct(DocumentManager $documentManager)
     {
         $this->dm = $documentManager;
         $this->repo = $this->dm->getRepository('PumukitPaellaStatsBundle:UserAction');
         $this->repoMultimedia = $this->dm->getRepository('PumukitSchemaBundle:MultimediaObject');
-        $this->repoSeries = $this->dm->getRepository('PumukitSchemaBundle:Series');
+        $this->repoAnalytics = $this->dm->getRepository('PumukitPaellaStatsBundle:MultimediaObjectAnalytics');
     }
 
 
+    /**
+     * Return an array of most viewed Multimedia Objects as results from the criteria/options.
+     * @param array $criteria
+     * @param array $options
+     * @return array
+     */
     public function getMostViewed(array $criteria = array(), array $options = array())
     {
 
@@ -93,6 +99,12 @@ class UserActionService
     }
 
 
+    /**
+     * Return an array of Most Used Browser as result from the criteria/options.
+     * @param array $criteria
+     * @param array $options
+     * @return array
+     */
     public function getMostUsedBrowser(array $criteria = array(), array $options = array())
     {
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
@@ -119,6 +131,13 @@ class UserActionService
 
     }
 
+
+    /**
+     * Return an array of Cities from which object multimedia are most visited from the criteria/options.
+     * @param array $criteria
+     * @param array $options
+     * @return array
+     */
     public function getCityFromMostViewed (array $criteria = array(), array $options = array())
     {
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
@@ -160,6 +179,50 @@ class UserActionService
         return array($aggregation, $total);
     }
 
+
+    /*
+     * Process the data from the Mongo "UserAction" Document to generate the statistics of the multimedia objects.
+     * @return array
+     */
+    public function getUnprocessedUserAction(){
+
+        $elemProcessed = array();
+
+        $qb = $this->repo->createQueryBuilder();
+        $mObjects = $qb->field('isProcessed')->equals(false)->getQuery()->execute();
+
+        foreach ($mObjects as $mObject) {
+
+            $id = $mObject->getId();
+            $objectId = $mObject->getMultimediaObject();
+            $inPoint = $mObject->getInPoint();
+            $outPoint = $mObject->getOutPoint();
+
+            $elemProcessed[] = $objectId;
+
+            $this->dm->persist($mObject);
+
+            for($i = $inPoint; $i < $outPoint; $i++){
+
+                $process_qb = $this->repoAnalytics->createQueryBuilder();
+                $process_qb ->findAndUpdate()
+                            ->upsert(true)
+                            ->field('multimediaObject')->equals($objectId)
+                            ->field('analytics.'.$i)->inc(1)
+                            ->getQuery()->execute();
+            }
+
+            $update_qb = $this->repo->createQueryBuilder();
+            $update_qb  ->findAndUpdate()
+                ->field('_id')->equals($id)
+                ->field('isProcessed')->set(true)
+                ->getQuery()->execute();
+        }
+
+        $this->dm->flush();
+
+        return array(array_values(array_unique($elemProcessed)), sizeof($elemProcessed));
+    }
 
     /**
      * Returns an array of MongoIds as results from the criteria.
