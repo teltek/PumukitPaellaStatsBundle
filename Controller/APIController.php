@@ -127,7 +127,7 @@ class APIController extends Controller
             'sort' => $sort,
             'from_date' => $fromDate,
             'to_date' => $toDate,
-            'm_viewed' => $mostViewed,
+            'mmobjs' => $mostViewed,
         );
 
         $data = $serializer->serialize($views, $request->getRequestFormat());
@@ -135,6 +135,54 @@ class APIController extends Controller
         return new Response($data);
     }
 
+
+     /**
+     * @Route("/views.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     */
+    public function viewsAction(Request $request)
+    {
+
+        $serializer = $this->get('serializer');
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
+        list($criteria, $sort, $fromDate, $toDate, $limit, $page) = $this->processRequestData($request);
+
+        $groupBy = $request->get('group_by') ?: 'month';
+
+        //NOTE: $criteria is the same as $criteria_mmobj to provide backwards compatibility.
+        $criteria_mmobj = $request->get('criteria_mmobj') ?: $criteria;
+        $criteria_series = $request->get('criteria_series') ?: array();
+
+        $options['from_date'] = $fromDate;
+        $options['to_date'] = $toDate;
+        $options['limit'] = $limit;
+        $options['page'] = $page;
+        $options['sort'] = $sort;
+        $options['group_by'] = $groupBy;
+        $options['criteria_mmobj'] = $criteria_mmobj;
+        $options['criteria_series'] = $criteria_series;
+
+        list($views, $total) = $viewsService->getTotalViewedGrouped($options);
+
+        $views = array(
+            'limit' => $limit,
+            'page' => $page,
+            'total' => $total,
+            'criteria' => array(
+                'criteria_mmobj' => $criteria_mmobj,
+                'criteria_series' => $criteria_series,
+            ),
+            'sort' => $sort,
+            'group_by' => $groupBy,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+            'views' => $views,
+        );
+
+        $data = $serializer->serialize($views, $request->getRequestFormat());
+
+        return new Response($data);
+    }
 
 
     /**

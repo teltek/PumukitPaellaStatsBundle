@@ -239,6 +239,54 @@ class UserActionService
 
 
     /**
+     * Returns an array with the total number of views (all mmobjs) on a certain date range, grouped by hour/day/month/year.
+     *
+     * If $options['criteria_mmobj'] exists, a query will be executed to filter using the resulting mmobj ids.
+     * If $options['criteria_series'] exists, a query will be executed to filter using the resulting series ids.
+     */
+    public function getTotalViewedGrouped(array $options = array())
+    {
+        return $this->getGroupedByAggrPipeline($options);
+    }
+
+
+    /**
+     * Returns an aggregation pipeline array with all necessary data to form a num_views array grouped by hour/day/...
+     */
+    public function getGroupedByAggrPipeline($options = array(), $matchExtra = array())
+    {
+        $viewsLogColl = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+        $options = $this->parseOptions($options);
+
+        if (!$matchExtra) {
+            if ($options['criteria_series']) {
+                $seriesIds = $this->getSeriesIdsWithCriteria($options['criteria_series']);
+                $matchExtra['series'] = array('$in' => $seriesIds);
+            }
+            if ($options['criteria_mmobj']) {
+                $mmobjIds = $this->getMmobjIdsWithCriteria($options['criteria_mmobj']);
+                $matchExtra['multimediaObject'] = array('$in' => $mmobjIds);
+            }
+        }
+
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+
+        $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+        $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => '$session'));
+        $pipeline[] = array('$group' => array("_id" => '$date', 'session_list' => array('$addToSet' => '$session')));
+        $pipeline[] = array('$project' => array('_id' => 1, 'numView' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array('_id' => $options['sort']));
+
+        $aggregation = $viewsLogColl->aggregate($pipeline);
+
+        $total = count($aggregation);
+        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
+
+        return array($aggregation, $total);
+    }
+
+
+    /**
      * Returns a 'paged' result of the aggregation array.
      *
      * @param aggregation The aggregation array to be paged
@@ -293,6 +341,34 @@ class UserActionService
         }
 
         return $pipeline;
+    }
+
+
+    /**
+     * Returns an array for a mongo $project pipeline to create a date-formatted string with just the required fields.
+     * It is used for grouping results in date ranges (hour/day/month/year).
+     */
+    private function getMongoProjectDateArray($groupBy, $dateField = '$date')
+    {
+        $mongoProjectDate = array();
+        switch ($groupBy) {
+            case 'hour':
+                $mongoProjectDate[] = 'H';
+                $mongoProjectDate[] = array('$substr' => array($dateField, 0, 2));
+                $mongoProjectDate[] = 'T';
+            case 'day':
+                $mongoProjectDate[] = array('$substr' => array($dateField, 8, 2));
+                $mongoProjectDate[] = '-';
+            default: //If it doesn't exists, it's 'month'
+            case 'month':
+                $mongoProjectDate[] = array('$substr' => array($dateField, 5, 2));
+                $mongoProjectDate[] = '-';
+            case 'year':
+                $mongoProjectDate[] = array('$substr' => array($dateField, 0, 4));
+                break;
+        }
+
+        return array('$concat' => array_reverse($mongoProjectDate));
     }
 
 
