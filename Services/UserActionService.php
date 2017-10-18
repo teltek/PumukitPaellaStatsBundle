@@ -50,7 +50,8 @@ class UserActionService
         $aggregation = $viewsCollection->aggregate($pipeline);
 
         $totalInAggegation = count($aggregation);
-        $total = 0;
+        //$total = $this->repoMultimedia->createQueryBuilder()->getQuery()->execute()->count();
+        $total = count($mmobjIds);
         $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
 
         $mostViewed = array();
@@ -61,16 +62,15 @@ class UserActionService
                 $mostViewed[] = array('mmobj' => $multimediaObject,
                     'num_viewed' => $element['num_viewed'],
                 );
-                $total += $element['num_viewed'];
             }
         }
 
         //Add mmobj with zero views
         if (count($aggregation) < $options['limit']) {
             if (count($aggregation) == 0) {
-                $max = min((1 + $options['page']) * $options['limit'], $total);
+                $max = min((1 + $options['page']) * $options['limit'], sizeof($mmobjIds));
                 for ($i = ($options['page'] * $options['limit']); $i < $max; ++$i) {
-                    $multimediaObject = $this->repoMultimedia->find($mmobjIds[$i - $totalInAggegation]);
+                    $multimediaObject = $this->repoMultimedia->find($mmobjIds[$i]);                   
                     if ($multimediaObject) {
                         $mostViewed[] = array('mmobj' => $multimediaObject,
                             'num_viewed' => 0,
@@ -272,9 +272,18 @@ class UserActionService
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
 
         $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
-        $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => '$session'));
-        $pipeline[] = array('$group' => array("_id" => '$date', 'session_list' => array('$addToSet' => '$session')));
-        $pipeline[] = array('$project' => array('_id' => 1, 'numView' => array('$size' => '$session_list')));
+        $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'multimediaObject' => 1));
+        $pipeline[] = array('$group' => array(
+                                            "_id" => array( 
+                                                'multimediaObject' => '$multimediaObject',
+                                                'session' => '$session',
+                                                'date' => '$date'
+                                            ),
+                                            'session_list' => array('$addToSet' => '$session')
+                                        )
+                            );
+        $pipeline[] = array('$project' => array('_id' => '$_id.date', 'views' => array('$size' => '$session_list')));
+        $pipeline[] = array('$group' => array('_id' => '$_id', 'numView' => array('$sum' => '$views')));
         $pipeline[] = array('$sort' => array('_id' => $options['sort']));
 
         $aggregation = $viewsLogColl->aggregate($pipeline);
