@@ -4,12 +4,14 @@ namespace Pumukit\PaellaStatsBundle\Services;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 class UserActionService
 {
     private $dm;
     private $repo;
     private $repoMultimedia;
+    private $repoSeries;
     private $repoAnalytics;
 
     public function __construct(DocumentManager $documentManager)
@@ -17,6 +19,7 @@ class UserActionService
         $this->dm = $documentManager;
         $this->repo = $this->dm->getRepository('PumukitPaellaStatsBundle:UserAction');
         $this->repoMultimedia = $this->dm->getRepository('PumukitSchemaBundle:MultimediaObject');
+        $this->repoSeries = $this->dm->getRepository('PumukitSchemaBundle:Series');
         $this->repoAnalytics = $this->dm->getRepository('PumukitPaellaStatsBundle:MultimediaObjectAnalytics');
     }
 
@@ -27,7 +30,7 @@ class UserActionService
      * @param array $options
      * @return array
      */
-    public function getMostViewed(array $criteria = array(), array $options = array())
+    public function getMmobjsMostViewed(array $criteria = array(), array $options = array())
     {
 
         $ids = array();
@@ -96,6 +99,84 @@ class UserActionService
 
         return array($mostViewed, $total);
 
+    }
+
+
+    /**
+     * Returns an array of series viewed on the given range and its number of views on that range.
+     */
+    public function getSeriesMostViewed(array $criteria = array(), array $options = array())
+    {
+
+        $ids = array();
+        $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+
+        $matchExtra = array();
+
+        $seriesIds = $this->getSeriesIdsWithCriteria($criteria);
+        $matchExtra['series'] = array('$in' => $seriesIds);
+
+        $options = $this->parseOptions($options);
+
+        $pipeline = array();
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+        
+        $pipeline[] = array ('$group' => array(     '_id' => '$series', 
+                                                    'session_list' =>  array('$addToSet' => array(
+                                                                                    'session' => '$session', 
+                                                                                    'multimediaObject' =>  '$multimediaObject'
+                                                                            ))
+                                        )
+                            );
+        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("num_viewed" => -1));
+        
+        $aggregation = $viewsCollection->aggregate($pipeline);
+        $totalInAggegation = count($aggregation);
+        $total = count($seriesIds);
+        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
+
+        $mostViewed = array();
+        foreach ($aggregation as $element) {
+            $ids[] = $element['_id'];
+            $series = $this->repoSeries->find($element['_id']);
+            if ($series) {
+                $mostViewed[] = array('series' => $series,
+                                      'num_viewed' => $element['num_viewed'],
+                );
+            }
+        }
+
+        //Add series with zero views
+        if (count($aggregation) < $options['limit']) {
+            if (count($aggregation) == 0) {
+                $max = min((1 + $options['page']) * $options['limit'], sizeof($seriesIds));
+                for ($i = ($options['page'] * $options['limit']); $i < $max; ++$i) {
+                    $series = $this->repoSeries->find($seriesIds[$i]);
+                    if ($series) {
+                        $mostViewed[] = array('series' => $series,
+                                              'num_viewed' => 0,
+                        );
+                    }
+                }
+            } else {
+                foreach ($seriesIds as $element) {
+                    if (!in_array($element, $ids)) {
+                        $series = $this->repoSeries->find($element);
+                        if ($series) {
+                            $mostViewed[] = array('series' => $series,
+                                                  'num_viewed' => 0,
+                            );
+                            if (count($mostViewed) == $options['limit']) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return array($mostViewed, $total);
     }
 
 
@@ -224,12 +305,39 @@ class UserActionService
         return array(array_values(array_unique($elemProcessed)), sizeof($elemProcessed));
     }
 
+
+    /*
+     * Return the series of a given $multimediaObjectId
+     * @param string $multimediaObjectId
+     * @return string
+    */
+    public function getSerieFromVideo($multimediaObjectId)
+    {
+        $qb = $this->repoMultimedia->createQueryBuilder();
+
+        return $qb->distinct('series')->field('_id')->equals($multimediaObjectId)->getQuery()->getSingleResult();
+    }
+
+
     /**
-     * Returns an array of MongoIds as results from the criteria.
+     * Returns an array of MongoIds from MultimediaObject repository as results from the criteria.
      */
     private function getMmobjIdsWithCriteria($criteria)
     {
         $qb = $this->repoMultimedia->createStandardQueryBuilder();
+        if ($criteria) {
+            $mmobjIds = $qb->addAnd($criteria);
+        }
+
+        return $qb->distinct('_id')->getQuery()->execute()->toArray();
+    }
+
+    /**
+     * Returns an array of MongoIds from Series repository as results from the criteria.
+     */
+    private function getSeriesIdsWithCriteria($criteria)
+    {
+        $qb = $this->repoSeries->createQueryBuilder();
         if ($criteria) {
             $mmobjIds = $qb->addAnd($criteria);
         }

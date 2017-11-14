@@ -100,11 +100,11 @@ class APIController extends Controller
 
 
     /**
-     * @Route("/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Route("/mmobj/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function mostViewedAction(Request $request)
+    public function mmobjMostViewedAction(Request $request)
     {
         $serializer = $this->get('serializer');
         $viewsService = $this->get('pumukit_paella_stats.stats');
@@ -117,7 +117,7 @@ class APIController extends Controller
         $options['page'] = $page;
         $options['sort'] = $sort;
 
-        list($mostViewed, $total) = $viewsService->getMostViewed($criteria, $options);
+        list($mostViewed, $total) = $viewsService->getMmobjsMostViewed($criteria, $options);
 
         $views = array(
             'limit' => $limit,
@@ -128,6 +128,44 @@ class APIController extends Controller
             'from_date' => $fromDate,
             'to_date' => $toDate,
             'mmobjs' => $mostViewed,
+        );
+
+        $data = $serializer->serialize($views, $request->getRequestFormat());
+
+        return new Response($data);
+    }
+
+
+
+    /**
+     * @Route("/series/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Method("GET")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
+     */
+    public function seriesMostViewedAction(Request $request)
+    {
+        $serializer = $this->get('serializer');
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
+        list($criteria, $sort, $fromDate, $toDate, $limit, $page) = $this->processRequestData($request);
+
+        $options['from_date'] = $fromDate;
+        $options['to_date'] = $toDate;
+        $options['limit'] = $limit;
+        $options['page'] = $page;
+        $options['sort'] = $sort;
+
+        list($mostViewed, $total) = $viewsService->getSeriesMostViewed($criteria, $options);
+
+        $views = array(
+            'limit' => $limit,
+            'page' => $page,
+            'total' => $total,
+            'criteria' => $criteria,
+            'sort' => $sort,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
+            'series' => $mostViewed,
         );
 
         $data = $serializer->serialize($views, $request->getRequestFormat());
@@ -259,6 +297,8 @@ class APIController extends Controller
 
     private function saveAction(Request $request, $multimediaObject, $in, $out){
 
+        $viewsService = $this->get('pumukit_paella_stats.stats');
+
         $ip = $request->getClientIp();
         $userAgent =  $request->server->get('HTTP_USER_AGENT');
         $user = ($this->getUser()) ? $this->getUser()->getId() : null;
@@ -266,7 +306,10 @@ class APIController extends Controller
         $session = $session->getId();
         $isLive = json_decode($request->get('isLive'));
 
-        $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $in, $out, $isLive, $user);
+
+        $series = $viewsService->getSerieFromVideo($multimediaObject);
+
+        $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
 
         $record = $this->get('geoip2.reader')->city($ip);
 

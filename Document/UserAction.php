@@ -60,6 +60,13 @@ class UserAction
      */
     private $multimediaObject;
     
+    /**
+     * @var string
+     *
+     * @MongoDB\ObjectId
+     */
+    private $series;
+
 	/**
      * @var int
      *
@@ -96,13 +103,14 @@ class UserAction
     private $isProcessed;
 
 
-    public function __construct($ip, $session, $userAgent, $multimediaObject, $inPoint, $outPoint, $isLive, $user = null)
+    public function __construct($ip, $session, $userAgent, $multimediaObject, $series, $inPoint, $outPoint, $isLive, $user = null)
     {
         $this->date = new \DateTime('now');
         $this->ip = $ip;
         $this->session = $session;
         $this->userAgent = $userAgent;
         $this->multimediaObject = $multimediaObject;
+        $this->series = $series;
         $this->inPoint = $inPoint;
         $this->outPoint = $outPoint;
         $this->isLive = $isLive;
@@ -228,13 +236,36 @@ class UserAction
 	/**
      * Get multimediaObject.
      *
-     * @return int $multimediaObject
+     * @return string $multimediaObject
      */
     public function getMultimediaObject()
     {
         return $this->multimediaObject;
     }
 	
+    /**
+     * Set series.
+     *
+     * @param string $series
+     *
+     * @return self
+     */
+    public function setSerie($series)
+    {
+        $this->series = $series;
+        return $this;
+    }
+    
+    /**
+     * Get series.
+     *
+     * @return string $series
+     */
+    public function getSerie()
+    {
+        return $this->series;
+    }
+
 	/**
      * Set inPoint.
      *
