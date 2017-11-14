@@ -50,7 +50,7 @@ class APIController extends Controller
 
         if (is_array($intervals)){
             foreach ($intervals as $interval){
-                if($interval['in'] && $interval['out']){
+                if(isset($interval['in']) && isset($interval['out'])){
                     $this->saveAction($request, $videoID, $interval['in'], $interval['out']);
                 }
             }
