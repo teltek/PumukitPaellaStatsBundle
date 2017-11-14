@@ -53,7 +53,6 @@ class UserActionService
         $aggregation = $viewsCollection->aggregate($pipeline);
 
         $totalInAggegation = count($aggregation);
-        //$total = $this->repoMultimedia->createQueryBuilder()->getQuery()->execute()->count();
         $total = count($mmobjIds);
         $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
 
