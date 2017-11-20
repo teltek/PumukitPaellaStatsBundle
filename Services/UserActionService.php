@@ -180,12 +180,12 @@ class UserActionService
 
 
     /**
-     * Return an array of Most Used Browser as result from the criteria/options.
+     * Return an array of Most Used Agents as result from the criteria/options.
      * @param array $criteria
      * @param array $options
      * @return array
      */
-    public function getMostUsedBrowser(array $criteria = array(), array $options = array())
+    public function getMostUsedAgents(array $criteria = array(), array $options = array())
     {
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
 
@@ -199,8 +199,8 @@ class UserActionService
         }
 
         $pipeline[] = array('$group' => array("_id" => '$userAgent', "session_list" => array('$addToSet' => '$session')));
-        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
-        $pipeline[] = array('$sort' => array("num_viewed" => -1));
+        $pipeline[] = array('$project' => array("_id" => 1, 'numView' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array("numView" => -1));
 
         $aggregation = $viewsCollection->aggregate($pipeline);
 

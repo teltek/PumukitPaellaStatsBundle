@@ -224,11 +224,11 @@ class APIController extends Controller
 
 
     /**
-     * @Route("/most_used_browser.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+     * @Route("/most_used_agents.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function mostUsedBrowserAction(Request $request)
+    public function mostUsedAgentsAction(Request $request)
     {
         $serializer = $this->get('serializer');
         $viewsService = $this->get('pumukit_paella_stats.stats');
@@ -241,7 +241,7 @@ class APIController extends Controller
         $options['page'] = $page;
         $options['sort'] = $sort;
 
-        list($mostUsed, $total) = $viewsService->getMostUsedBrowser($criteria, $options);
+        list($mostUsed, $total) = $viewsService->getMostUsedAgents($criteria, $options);
 
         $views = array(
             'limit' => $limit,
@@ -311,23 +311,28 @@ class APIController extends Controller
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
 
-        $record = $this->get('geoip2.reader')->city($ip);
+        try {
+            
+            $record = $this->get('geoip2.reader')->city($ip);
 
-        $userGeolocation = new Geolocation();
-        $userGeolocation->setContinent( $record->continent->name);
-        $userGeolocation->setContinentCode($record->continent->code);
-        $userGeolocation->setCountry($record->country->name);
-        $userGeolocation->setCountryCode($record->country->isoCode);
-        $userGeolocation->setSubCountry($record->mostSpecificSubdivision->name);
-        $userGeolocation->setSubCountryCode($record->mostSpecificSubdivision->isoCode);
-        $userGeolocation->setCity($record->city->name);
-        $userGeolocation->setLatitude($record->location->latitude);
-        $userGeolocation->setLongitude($record->location->longitude);
-        $userGeolocation->setTimeZone($record->location->timeZone);
-        $userGeolocation->setPostal($record->postal->code);
+            $userGeolocation = new Geolocation();
+            $userGeolocation->setContinent( $record->continent->name);
+            $userGeolocation->setContinentCode($record->continent->code);
+            $userGeolocation->setCountry($record->country->name);
+            $userGeolocation->setCountryCode($record->country->isoCode);
+            $userGeolocation->setSubCountry($record->mostSpecificSubdivision->name);
+            $userGeolocation->setSubCountryCode($record->mostSpecificSubdivision->isoCode);
+            $userGeolocation->setCity($record->city->name);
+            $userGeolocation->setLatitude($record->location->latitude);
+            $userGeolocation->setLongitude($record->location->longitude);
+            $userGeolocation->setTimeZone($record->location->timeZone);
+            $userGeolocation->setPostal($record->postal->code);
 
-        $userAction->setGeolocation($userGeolocation);
+            $userAction->setGeolocation($userGeolocation);
+        
+        } catch (\Exception $e) {}
 
+       
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
         $dm->flush();
