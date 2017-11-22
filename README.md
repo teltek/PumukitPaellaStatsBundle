@@ -68,3 +68,10 @@ gpslab_geoip:
     # It's a default value. You can change it.
     locales: [ '%locale%' ]
 ```
+
+
+### OPTIONAL: Load example statistics data
+
+```bash
+    php app/console pumukit:init:paellastatsexample
+```
