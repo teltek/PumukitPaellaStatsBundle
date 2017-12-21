@@ -74,7 +74,7 @@ class APIController extends Controller
         $serializer = $this->get('serializer');
         $viewsService = $this->get('pumukit_paella_stats.stats');
 
-        list($processed, $total) = $viewsService->getUnprocessedUserAction();
+        list($processed, $total) = $viewsService->processUserAction();
 
         $log = array(
             'processed' => $processed,
@@ -136,7 +136,6 @@ class APIController extends Controller
     }
 
 
-
     /**
      * @Route("/series/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
@@ -176,6 +175,8 @@ class APIController extends Controller
 
      /**
      * @Route("/views.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
+	 * @Method("GET")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
     public function viewsAction(Request $request)
     {
@@ -259,6 +260,7 @@ class APIController extends Controller
         return new Response($data);
     }
 
+	
     /**
      * @Route("/city_from_most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")

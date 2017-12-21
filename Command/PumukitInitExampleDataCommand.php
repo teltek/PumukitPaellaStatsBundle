@@ -8,19 +8,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use ZipArchive;
+//use ZipArchive;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
 use Pumukit\SchemaBundle\Document\Series;
 use Pumukit\SchemaBundle\Document\Pic;
-use Pumukit\SchemaBundle\Document\Tag;
-use Pumukit\SchemaBundle\Document\Person;
-use Pumukit\SchemaBundle\Document\Role;
-use Pumukit\StatsBundle\Document\ViewsLog;
+//use Pumukit\SchemaBundle\Document\Tag;
+//use Pumukit\SchemaBundle\Document\Person;
+//use Pumukit\SchemaBundle\Document\Role;
+//use Pumukit\StatsBundle\Document\ViewsLog;
 
 class PumukitInitExampleDataCommand extends ContainerAwareCommand
 {
     private $dm = null;
-    private $repo = null;
+    //private $repo = null;
 
     protected function configure()
     {
@@ -36,9 +36,9 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $newFile = $this->getContainer()->getParameter('kernel.cache_dir').'/tmp_file.zip';
+        //$newFile = $this->getContainer()->getParameter('kernel.cache_dir').'/tmp_file.zip';
         $this->dm = $this->getContainer()->get('doctrine_mongodb')->getManager();
-        $this->repo = $this->dm->getRepository('PumukitSchemaBundle:Tag');
+        //$this->repo = $this->dm->getRepository('PumukitSchemaBundle:Tag');
 
         $this->loadUserAction($this->dm, $output);
 
