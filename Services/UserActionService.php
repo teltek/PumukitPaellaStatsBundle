@@ -239,13 +239,27 @@ class UserActionService
             }
         }
 
-        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+		
+		$pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+		$mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+		$pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'multimediaObject' => 1));
+		$pipeline[] = array('$group' => array(
+											"_id" => array( 
+												'userAgent' => '$userAgent',
+											),
+											'session_list' => array('$addToSet' => 
+																array(
+																	'multimediaObject' => '$multimediaObject',
+																	'session' => '$session',
+																	'date' => '$date'
+																)
+															)
+										)
+							);
+		$pipeline[] = array('$project' => array('_id' => '$_id.userAgent', 'num_viewed' => array('$size' => '$session_list')));
+		$pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
 
-        $pipeline[] = array('$group' => array("_id" => '$userAgent', "session_list" => array('$addToSet' => '$session')));
-        $pipeline[] = array('$project' => array("_id" => 1, 'numView' => array('$size' => '$session_list')));
-        $pipeline[] = array('$sort' => array("numView" => -1));
-
-        $aggregation = $viewsCollection->aggregate($pipeline);
+		$aggregation = $viewsCollection->aggregate($pipeline);
 
         $total = count($aggregation);
         $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
@@ -262,37 +276,61 @@ class UserActionService
      */
     public function getCityFromMostViewed (array $criteria = array(), array $options = array())
     {
-        $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+        
+		$viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
 
         $options = $this->parseOptions($options);
 
         $pipeline = array();
-        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date']);
+        $matchExtra = array();
 
-        if(isset($criteria) and isset($criteria['id']) and 0 != count($criteria)) {
-            $pipeline[] = array('$match' => array('multimediaObject' => new \MongoId($criteria['id'])));
+        if(isset($criteria['criteria_series'])) {
+
+            if(isset($criteria['criteria_series']['id'])) {
+
+                $matchExtra['series'] = array('$in' => array(new \MongoId($criteria['criteria_series']['id'])));
+
+            } else if (isset($criteria['criteria_series']['$text']['$search'])) {
+
+                $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
+                $matchExtra['series'] = array('$in' => $seriesIds);
+
+            }
+
+        } else if (isset($criteria['criteria_mmobj'])) {
+
+            if(isset($criteria['criteria_mmobj']['id'])) {
+
+                $matchExtra['multimediaObject'] = array('$in' => array(new \MongoId($criteria['criteria_mmobj']['id'])));
+
+            } else if (isset($criteria['criteria_mmobj']['$text']['$search'])) {
+
+                $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
+                $matchExtra['multimediaObject'] = array('$in' => $objsIds);
+            
+            }
         }
 
-        $pipeline[] = array('$group' => array(
-            "_id" => array(
-                'continent' => '$geolocation.continent',
-                'continent_code' => '$geolocation.continentCode',
-                'country' => '$geolocation.country',
-                'country_code' => '$geolocation.countryCode',
-                'sub_country' => '$geolocation.subCountry',
-                'sub_country_code' => '$geolocation.subCountryCode',
-                'city' => '$geolocation.city',
-                //'latitude' => '$geolocation.location.latitude',
-                //'longitude' => '$geolocation.location.longitude',
-                //'time_zone' => '$geolocation.location.timeZone',
-                //'postal' => '$geolocation.postal'
-            ),
-            "session_list" => array('$addToSet' => '$session'))
-        );
-
-        $pipeline[] = array('$project' => array("_id" => 1, 'num_viewed' => array('$size' => '$session_list')));
-        $pipeline[] = array('$sort' => array("num_viewed" => -1));
-
+		
+		$pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+		$mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+		$pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'geolocation' => 1, 'multimediaObject' => 1));
+		$pipeline[] = array('$group' => array(
+											"_id" => array( 
+												'city' => '$geolocation.city',
+											),
+											'session_list' => array('$addToSet' => 
+																array(
+																	'multimediaObject' => '$multimediaObject',
+																	'session' => '$session',
+																	'date' => '$date'
+																)
+															)
+										)
+							);
+		$pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
+		$pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
+		
         $aggregation = $viewsCollection->aggregate($pipeline);
 
         $total = count($aggregation);

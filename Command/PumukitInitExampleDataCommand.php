@@ -17,6 +17,8 @@ use Pumukit\SchemaBundle\Document\Pic;
 //use Pumukit\SchemaBundle\Document\Role;
 //use Pumukit\StatsBundle\Document\ViewsLog;
 
+use Pumukit\PaellaStatsBundle\Document\Geolocation;
+
 class PumukitInitExampleDataCommand extends ContainerAwareCommand
 {
     private $dm = null;
@@ -57,10 +59,10 @@ EOT
                              'Mozilla/5.0 PuMuKIT/2.2 (The answer to everything: 42) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
                              'Mozilla/5.0 PuMuKIT/2.2 (Internet Explorer didn\'t survive) (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
         );
-        $clientips = array(	'123.213.231.132',
-                            '0.0.0.1',
-                            '12.12.12.21',
-                            '74.125.224.72',
+        $clientips = array(	'213.73.40.242',
+                            '193.146.99.17',
+                            '156.35.33.105',
+                            '150.214.204.231',
         );
 		
 		$sessions = array(	'882qa12rvak02o7qjfrfa0k8j0',
@@ -68,13 +70,71 @@ EOT
                             '882qa23fvak02o7qjfrfa0k8j0',
                             '882q82crvak02o7qjfrfa0k8j0',
         );
+		
+		$geo = array(		
+					array(
+						'continent' => 'Europe',
+						'continentCode' => 'EU',
+						'country' => 'Spain',
+						'countryCode' => 'ES',
+						'subCountry' => 'Barcelona',
+						'subCountryCode' => 'B',
+						'city' => 'Barcelona',
+						'location' => array(
+										'latitude' => '41.397842',
+										'longitude' => '2.201859',
+										'timeZone' => 'Europe/Madrid',
+						),
+						'postal' => '08005',
+					), array(
+						'continent' => 'Europe',
+						'continentCode' => 'EU',
+						'country' => 'Spain',
+						'countryCode' => 'ES',
+						'subCountry' => 'Malaga',
+						'subCountryCode' => 'MA',
+						'city' => 'Malaga',
+						'location' => array(
+										'latitude' => '36.715572',
+										'longitude' => ' -4.422631',
+										'timeZone' => 'Europe/Madrid',
+						),
+						'postal' => '29001',
+					), array(
+						'continent' => 'Europe',
+						'continentCode' => 'EU',
+						'country' => 'Spain',
+						'countryCode' => 'ES',
+						'subCountry' => 'Asturias',
+						'subCountryCode' => 'A',
+						'city' => 'Asturias',
+						'location' => array(
+										'latitude' => '43.545657',
+										'longitude' => ' -5.663072',
+										'timeZone' => 'Europe/Madrid',
+						),
+						'postal' => '33201',
+					), array(
+						'continent' => 'Europe',
+						'continentCode' => 'EU',
+						'country' => 'Spain',
+						'countryCode' => 'ES',
+						'subCountry' => 'Galicia',
+						'subCountryCode' => 'G',
+						'city' => 'Galicia',
+						'location' => array(
+										'latitude' => '42.982991',
+										'longitude' => ' -7.568308',
+										'timeZone' => 'Europe/Madrid',
+						),
+						'postal' => '27294',
+					),
+        );
 
         $initTime = (new \DateTime('2 years ago'))->getTimestamp();
         $endTime = (new \DateTime())->getTimestamp();
 
-        $clientip = $clientips[array_rand($clientips)];
-        $useragent = $useragents[array_rand($useragents)];
-		$session = $sessions[array_rand($sessions)];
+        
 
         $progress = new \Symfony\Component\Console\Helper\ProgressBar($output, count($allMmobjs));
         $output->writeln("\nCreating test views on ViewsLog...");
@@ -83,6 +143,12 @@ EOT
 
         $logs = array();
         foreach ($allMmobjs as $id => $mmobj) {
+			
+			$clientip = $clientips[array_rand($clientips)];
+			$userGeolocation = $geo[array_rand($geo)];
+			$session = $sessions[array_rand($sessions)];
+			$useragent = $useragents[array_rand($useragents)];			
+			
             $progress->setProgress($id);
             for ($i = rand(1, 1000); $i > 0; --$i) {
                 $randTimestamp = rand($initTime, $endTime);
@@ -92,15 +158,16 @@ EOT
                 $logs[] = array(
                     'date' => new \MongoDate($randTimestamp),
                     'ip' => $clientip,
-                    "user" => null,
-                    "session" => $session,
+					'geolocation' => $userGeolocation,
+                    'user' => null,
+                    'session' => $session,
                     'userAgent' => $useragent,
                     'multimediaObject' => new \MongoId($mmobj->getId()),
                     'series' => new \MongoId($mmobj->getSeries()->getId()),
-                    "inPoint" => $in,
-                    "outPoint" => $out,
-                    "isLive" => false,
-                    "isProcessed" => false,
+                    'inPoint' => $in,
+                    'outPoint' => $out,
+                    'isLive' => false,
+                    'isProcessed' => false,
                 );
                 $mmobj->incNumview();
                 $dm->persist($mmobj);
