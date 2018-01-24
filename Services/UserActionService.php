@@ -12,7 +12,7 @@ class UserActionService
     private $repo;
     private $repoMultimedia;
     private $repoSeries;
-    private $repoAnalytics;
+    private $repoAudience;
 
     public function __construct(DocumentManager $documentManager)
     {
@@ -20,7 +20,7 @@ class UserActionService
         $this->repo = $this->dm->getRepository('PumukitPaellaStatsBundle:UserAction');
         $this->repoMultimedia = $this->dm->getRepository('PumukitSchemaBundle:MultimediaObject');
         $this->repoSeries = $this->dm->getRepository('PumukitSchemaBundle:Series');
-        $this->repoAnalytics = $this->dm->getRepository('PumukitPaellaStatsBundle:MultimediaObjectAnalytics');
+        $this->repoAudience = $this->dm->getRepository('PumukitPaellaStatsBundle:MultimediaObjectAudience');
     }
 
 
@@ -341,10 +341,10 @@ class UserActionService
 
 
     /*
-     * Process the data from the Mongo "UserAction" Document to generate the statistics of the multimedia objects.
+     * Process the data from the Mongo "UserAction" Document to generate the audience of the multimedia objects.
      * @return array
      */
-    public function processUserAction(){
+    public function processAudienceUserAction(){
 
         $elemProcessed = array();
 
@@ -364,11 +364,11 @@ class UserActionService
 
             for($i = $inPoint; $i < $outPoint; $i++){
 
-                $process_qb = $this->repoAnalytics->createQueryBuilder();
+                $process_qb = $this->repoAudience->createQueryBuilder();
                 $process_qb ->findAndUpdate()
                             ->upsert(true)
                             ->field('multimediaObject')->equals($objectId)
-                            ->field('analytics.'.$i)->inc(1)
+                            ->field('audience.'.$i)->inc(1)
                             ->getQuery()->execute();
             }
 
@@ -384,6 +384,15 @@ class UserActionService
         return array(array_values(array_unique($elemProcessed)), sizeof($elemProcessed));
     }
 
+	
+	/*
+     * Returns the audience of a given $multimediaObjectId
+     * @return array
+     */
+    public function getAudienceUserAction($multimediaObjectId){
+		return array();
+	}
+	
 
     /*
      * Return the series of a given $multimediaObjectId
