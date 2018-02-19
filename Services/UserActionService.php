@@ -384,15 +384,6 @@ class UserActionService
         return array(array_values(array_unique($elemProcessed)), sizeof($elemProcessed));
     }
 
-	
-	/*
-     * Returns the audience of a given $multimediaObjectId
-     * @return array
-     */
-    public function getAudienceUserAction($multimediaObjectId){
-		return array();
-	}
-	
 
     /*
      * Return the series of a given $multimediaObjectId
@@ -480,7 +471,7 @@ class UserActionService
                                         )
                             );
         $pipeline[] = array('$project' => array('_id' => '$_id.date', 'views' => array('$size' => '$session_list')));
-        $pipeline[] = array('$group' => array('_id' => '$_id', 'numView' => array('$sum' => '$views')));
+        $pipeline[] = array('$group' => array('_id' => '$_id', 'num_viewed' => array('$sum' => '$views')));
         $pipeline[] = array('$sort' => array('_id' => $options['sort']));
 
         $aggregation = $viewsLogColl->aggregate($pipeline);
