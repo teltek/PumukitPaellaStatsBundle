@@ -28,7 +28,7 @@ class APIController extends Controller
      */
     public function saveSingleAction(Request $request, $videoID)
     {
-        
+
         $this->saveAction($request, $videoID, $request->get('in'), $request->get('out'));
 
         return new JsonResponse(
@@ -87,7 +87,7 @@ class APIController extends Controller
         return new Response($data);
     }
 
-	
+
 	/**
      * @Route("/get_audience/{videoID}")
      * @Method("GET")
@@ -97,7 +97,7 @@ class APIController extends Controller
     {
         return new Response("TO-DO");
     }
-	
+
 
     /**
      * @Route("/test.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
@@ -271,7 +271,7 @@ class APIController extends Controller
         return new Response($data);
     }
 
-	
+
     /**
      * @Route("/city_from_most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
@@ -325,7 +325,7 @@ class APIController extends Controller
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
 
         try {
-            
+
             $record = $this->get('geoip2.reader')->city($ip);
 
             $userGeolocation = new Geolocation();
@@ -342,10 +342,10 @@ class APIController extends Controller
             $userGeolocation->setPostal($record->postal->code);
 
             $userAction->setGeolocation($userGeolocation);
-        
+
         } catch (\Exception $e) {}
 
-       
+
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
         $dm->flush();
