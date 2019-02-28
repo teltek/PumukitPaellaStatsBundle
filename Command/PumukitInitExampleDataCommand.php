@@ -63,7 +63,7 @@ EOT
                             '882q82crvak02o7qjfrfa0k8j0',
         );
 		
-		$geo = array(		
+		/*$geo = array(		
 					array(
 						'continent' => 'Europe',
 						'continentCode' => 'EU',
@@ -121,7 +121,7 @@ EOT
 						),
 						'postal' => '27294',
 					),
-        );
+        );*/
 
         $initTime = (new \DateTime('2 years ago'))->getTimestamp();
         $endTime = (new \DateTime())->getTimestamp();
@@ -137,7 +137,7 @@ EOT
         foreach ($allMmobjs as $id => $mmobj) {
 			
 			$clientip = $clientips[array_rand($clientips)];
-			$userGeolocation = $geo[array_rand($geo)];
+			//$userGeolocation = $geo[array_rand($geo)];
 			$session = $sessions[array_rand($sessions)];
 			$useragent = $useragents[array_rand($useragents)];			
 			
@@ -150,7 +150,7 @@ EOT
                 $logs[] = array(
                     'date' => new \MongoDate($randTimestamp),
                     'ip' => $clientip,
-					'geolocation' => $userGeolocation,
+					//'geolocation' => $userGeolocation,
                     'user' => null,
                     'session' => $session,
                     'userAgent' => $useragent,

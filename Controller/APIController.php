@@ -323,7 +323,7 @@ class APIController extends Controller
         $series = $viewsService->getSerieFromVideo($multimediaObject);
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
-
+/*
         try {
 
             $record = $this->get('geoip2.reader')->city($ip);
@@ -344,7 +344,7 @@ class APIController extends Controller
             $userAction->setGeolocation($userGeolocation);
 
         } catch (\Exception $e) {}
-
+*/
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
