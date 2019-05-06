@@ -1,8 +1,8 @@
 <?php
+
 namespace Pumukit\PaellaStatsBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Validator\Constraints\False;
 
 /**
  * Pumukit\PaellaStatsBundle\Document\MultimediaObjectAudience.
@@ -17,15 +17,15 @@ class MultimediaObjectAudience
      * @MongoDB\Id
      */
     private $id;
-    
-	/**
-     * @var \Date
+
+    /**
+     * @var \DateTime
      *
      * @MongoDB\Date
      */
     private $lastUpdate;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\ObjectId
@@ -39,41 +39,41 @@ class MultimediaObjectAudience
      */
     private $audience = array();
 
-
     public function __construct($multimediaObject, $audience = array())
     {
         $this->lastUpdate = new \DateTime('now');
         $this->multimediaObject = $multimediaObject;
         $this->audience = $audience;
     }
-	
+
     /**
      * Get id.
      *
-     * @return id $id
+     * @return int $id
      */
     public function getId()
     {
         return $this->id;
     }
-	
+
     /**
      * Set lastUpdate.
      *
-     * @param date $lastUpdate
+     * @param \DateTime $lastUpdate
      *
      * @return self
      */
     public function setLastUpdate($lastUpdate)
     {
         $this->lastUpdate = $lastUpdate;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get lastUpdate.
      *
-     * @return date $lastUpdate
+     * @return \DateTime $lastUpdate
      */
     public function getLastUpdate()
     {
@@ -90,10 +90,11 @@ class MultimediaObjectAudience
     public function setMultimediaObject($multimediaObject)
     {
         $this->multimediaObject = $multimediaObject;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get multimediaObject.
      *
      * @return int $multimediaObject
@@ -107,7 +108,7 @@ class MultimediaObjectAudience
      * Set audience.
      *
      * @param int|null $second
-     * @param int $times
+     * @param int      $times
      */
     public function setAudience($second = null, $times = 0)
     {
@@ -123,7 +124,7 @@ class MultimediaObjectAudience
      */
     public function getAudience($second = null)
     {
-        if ($second == null) {
+        if (null == $second) {
             return 0;
         }
 

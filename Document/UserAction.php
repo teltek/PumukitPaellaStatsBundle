@@ -1,8 +1,8 @@
 <?php
+
 namespace Pumukit\PaellaStatsBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Validator\Constraints\False;
 
 /**
  * Pumukit\PaellaStatsBundle\Document\UserAction.
@@ -17,29 +17,29 @@ class UserAction
      * @MongoDB\Id
      */
     private $id;
-    
-	/**
-     * @var \Date
+
+    /**
+     * @var \DateTime
      *
      * @MongoDB\Date
      */
     private $date;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\String
      */
     private $ip;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\ObjectId
      */
     private $user;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\String
@@ -52,14 +52,14 @@ class UserAction
      * @MongoDB\String
      */
     private $userAgent;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\ObjectId
      */
     private $multimediaObject;
-    
+
     /**
      * @var string
      *
@@ -67,14 +67,14 @@ class UserAction
      */
     private $series;
 
-	/**
+    /**
      * @var int
      *
      * @MongoDB\Int
      */
     private $inPoint;
-    
-	/**
+
+    /**
      * @var int
      *
      * @MongoDB\Int
@@ -102,7 +102,6 @@ class UserAction
      */
     private $isProcessed;
 
-
     public function __construct($ip, $session, $userAgent, $multimediaObject, $series, $inPoint, $outPoint, $isLive, $user = null)
     {
         $this->date = new \DateTime('now');
@@ -117,40 +116,41 @@ class UserAction
         $this->user = $user;
         $this->isProcessed = false;
     }
-	
+
     /**
      * Get id.
      *
-     * @return id $id
+     * @return int $id
      */
     public function getId()
     {
         return $this->id;
     }
-	
+
     /**
      * Set date.
      *
-     * @param date $date
+     * @param \DateTime $date
      *
      * @return self
      */
     public function setDate($date)
     {
         $this->date = $date;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get date.
      *
-     * @return date $date
+     * @return \DateTime $date
      */
     public function getDate()
     {
         return $this->date;
     }
-    
+
     /**
      * Set ip.
      *
@@ -161,10 +161,11 @@ class UserAction
     public function setIp($ip)
     {
         $this->ip = $ip;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get ip.
      *
      * @return string $ip
@@ -173,8 +174,8 @@ class UserAction
     {
         return $this->ip;
     }
-    
-	/**
+
+    /**
      * Set session.
      *
      * @param string $session
@@ -184,10 +185,11 @@ class UserAction
     public function setSession($session)
     {
         $this->session = $session;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get session.
      *
      * @return string $session
@@ -207,6 +209,7 @@ class UserAction
     public function setUserAgent($userAgent)
     {
         $this->userAgent = $userAgent;
+
         return $this;
     }
 
@@ -220,7 +223,7 @@ class UserAction
         return $this->userAgent;
     }
 
-	/**
+    /**
      * Set multimediaObject.
      *
      * @param string $multimediaObject
@@ -230,10 +233,11 @@ class UserAction
     public function setMultimediaObject($multimediaObject)
     {
         $this->multimediaObject = $multimediaObject;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get multimediaObject.
      *
      * @return string $multimediaObject
@@ -242,7 +246,7 @@ class UserAction
     {
         return $this->multimediaObject;
     }
-	
+
     /**
      * Set series.
      *
@@ -253,9 +257,10 @@ class UserAction
     public function setSerie($series)
     {
         $this->series = $series;
+
         return $this;
     }
-    
+
     /**
      * Get series.
      *
@@ -266,7 +271,7 @@ class UserAction
         return $this->series;
     }
 
-	/**
+    /**
      * Set inPoint.
      *
      * @param int $inPoint
@@ -276,10 +281,11 @@ class UserAction
     public function setInPoint($inPoint)
     {
         $this->inPoint = $inPoint;
+
         return $this;
     }
-	
-	/**
+
+    /**
      * Get inPoint.
      *
      * @return int $inPoint
@@ -288,8 +294,8 @@ class UserAction
     {
         return $this->inPoint;
     }
-	
-	/**
+
+    /**
      * Set outPoint.
      *
      * @param int $outPoint
@@ -299,10 +305,11 @@ class UserAction
     public function setOutPoint($outPoint)
     {
         $this->outPoint = $outPoint;
+
         return $this;
     }
-	
-	/**
+
+    /**
      * Get outPoint.
      *
      * @return int $outPoint
@@ -311,7 +318,7 @@ class UserAction
     {
         return $this->outPoint;
     }
-	
+
     /**
      * Set isLive.
      *
@@ -322,9 +329,10 @@ class UserAction
     public function setIsLive($isLive)
     {
         $this->isLive = $isLive;
+
         return $this;
     }
-    
+
     /**
      * Get isLive.
      *
@@ -345,9 +353,10 @@ class UserAction
     public function setUser($user)
     {
         $this->user = $user;
+
         return $this;
     }
-	
+
     /**
      * Get user.
      *
@@ -366,9 +375,10 @@ class UserAction
     public function setGeolocation(Geolocation $geolocation)
     {
         $this->geolocation = $geolocation;
+
         return $this;
     }
-    
+
     /**
      * Get geolocation.
      *
@@ -387,6 +397,7 @@ class UserAction
     public function setIsProcessed($isProcessed)
     {
         $this->isProcessed = $isProcessed;
+
         return $this;
     }
 

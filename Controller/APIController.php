@@ -13,14 +13,11 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
 use Pumukit\PaellaStatsBundle\Document\Geolocation;
 
-
 /**
  * @Route("/paella")
  */
 class APIController extends Controller
 {
-
-
     /**
      * @Route("/save_single/{videoID}", requirements={"in": "\d+", "out": "\d+"})
      * @Method("POST")
@@ -28,16 +25,14 @@ class APIController extends Controller
      */
     public function saveSingleAction(Request $request, $videoID)
     {
-
         $this->saveAction($request, $videoID, $request->get('in'), $request->get('out'));
 
         return new JsonResponse(
             array(
-                'id' => $videoID
+                'id' => $videoID,
             )
         );
     }
-
 
     /**
      * @Route("/save_group/{videoID}")
@@ -48,9 +43,9 @@ class APIController extends Controller
     {
         $intervals = $request->get('intervals');
 
-        if (is_array($intervals)){
-            foreach ($intervals as $interval){
-                if(isset($interval['in']) && isset($interval['out'])){
+        if (is_array($intervals)) {
+            foreach ($intervals as $interval) {
+                if (isset($interval['in']) && isset($interval['out'])) {
                     $this->saveAction($request, $videoID, $interval['in'], $interval['out']);
                 }
             }
@@ -58,11 +53,10 @@ class APIController extends Controller
 
         return new JsonResponse(
             array(
-                'id' => $videoID
+                'id' => $videoID,
             )
         );
     }
-
 
     /**
      * @Route("/process_audience.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
@@ -79,7 +73,7 @@ class APIController extends Controller
         $log = array(
             'processed' => $processed,
             'total' => $total,
-            'date' => new \DateTime('now')
+            'date' => new \DateTime('now'),
         );
 
         $data = $serializer->serialize($log, $request->getRequestFormat());
@@ -87,17 +81,15 @@ class APIController extends Controller
         return new Response($data);
     }
 
-
-	/**
+    /**
      * @Route("/get_audience/{videoID}")
      * @Method("GET")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
     public function getAudience(Request $request, $videoID)
     {
-        return new Response("TO-DO");
+        return new Response('TO-DO');
     }
-
 
     /**
      * @Route("/test.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
@@ -106,9 +98,8 @@ class APIController extends Controller
      */
     public function testAction(Request $request)
     {
-        return new Response("hello world!");
+        return new Response('hello world!');
     }
-
 
     /**
      * @Route("/mmobj/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
@@ -146,7 +137,6 @@ class APIController extends Controller
         return new Response($data);
     }
 
-
     /**
      * @Route("/series/most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
@@ -183,15 +173,13 @@ class APIController extends Controller
         return new Response($data);
     }
 
-
-     /**
+    /**
      * @Route("/views.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
-	 * @Method("GET")
+     * @Method("GET")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
     public function viewsAction(Request $request)
     {
-
         $serializer = $this->get('serializer');
         $viewsService = $this->get('pumukit_paella_stats.stats');
 
@@ -234,7 +222,6 @@ class APIController extends Controller
         return new Response($data);
     }
 
-
     /**
      * @Route("/most_used_agents.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
      * @Method("GET")
@@ -270,7 +257,6 @@ class APIController extends Controller
 
         return new Response($data);
     }
-
 
     /**
      * @Route("/city_from_most_viewed.{_format}", defaults={"_format"="json"}, requirements={"_format": "json|xml"})
@@ -308,43 +294,42 @@ class APIController extends Controller
         return new Response($data);
     }
 
-    private function saveAction(Request $request, $multimediaObject, $in, $out){
-
+    private function saveAction(Request $request, $multimediaObject, $in, $out)
+    {
         $viewsService = $this->get('pumukit_paella_stats.stats');
 
         $ip = $request->getClientIp();
-        $userAgent =  $request->server->get('HTTP_USER_AGENT');
+        $userAgent = $request->server->get('HTTP_USER_AGENT');
         $user = ($this->getUser()) ? $this->getUser()->getId() : null;
         $session = new Session();
         $session = $session->getId();
         $isLive = json_decode($request->get('isLive'));
 
-
         $series = $viewsService->getSerieFromVideo($multimediaObject);
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
-/*
-        try {
-
-            $record = $this->get('geoip2.reader')->city($ip);
-
-            $userGeolocation = new Geolocation();
-            $userGeolocation->setContinent( $record->continent->name);
-            $userGeolocation->setContinentCode($record->continent->code);
-            $userGeolocation->setCountry($record->country->name);
-            $userGeolocation->setCountryCode($record->country->isoCode);
-            $userGeolocation->setSubCountry($record->mostSpecificSubdivision->name);
-            $userGeolocation->setSubCountryCode($record->mostSpecificSubdivision->isoCode);
-            $userGeolocation->setCity($record->city->name);
-            $userGeolocation->setLatitude($record->location->latitude);
-            $userGeolocation->setLongitude($record->location->longitude);
-            $userGeolocation->setTimeZone($record->location->timeZone);
-            $userGeolocation->setPostal($record->postal->code);
-
-            $userAction->setGeolocation($userGeolocation);
-
-        } catch (\Exception $e) {}
-*/
+        /*
+                try {
+        
+                    $record = $this->get('geoip2.reader')->city($ip);
+        
+                    $userGeolocation = new Geolocation();
+                    $userGeolocation->setContinent( $record->continent->name);
+                    $userGeolocation->setContinentCode($record->continent->code);
+                    $userGeolocation->setCountry($record->country->name);
+                    $userGeolocation->setCountryCode($record->country->isoCode);
+                    $userGeolocation->setSubCountry($record->mostSpecificSubdivision->name);
+                    $userGeolocation->setSubCountryCode($record->mostSpecificSubdivision->isoCode);
+                    $userGeolocation->setCity($record->city->name);
+                    $userGeolocation->setLatitude($record->location->latitude);
+                    $userGeolocation->setLongitude($record->location->longitude);
+                    $userGeolocation->setTimeZone($record->location->timeZone);
+                    $userGeolocation->setPostal($record->postal->code);
+        
+                    $userAction->setGeolocation($userGeolocation);
+        
+                } catch (\Exception $e) {}
+        */
 
         $dm = $this->get('doctrine_mongodb')->getManager();
         $dm->persist($userAction);
@@ -378,8 +363,8 @@ class APIController extends Controller
         if (!strpos($toDate, 'T')) {
             $toDate .= 'T23:59:59';
         }
-        $fromDate = \DateTime::createFromFormat('Y-m-d\TH:i:s', $fromDate)?:null;
-        $toDate = \DateTime::createFromFormat('Y-m-d\TH:i:s', $toDate)?:null;
+        $fromDate = \DateTime::createFromFormat('Y-m-d\TH:i:s', $fromDate) ?: null;
+        $toDate = \DateTime::createFromFormat('Y-m-d\TH:i:s', $toDate) ?: null;
 
         return array($criteria, $sort, $fromDate, $toDate, $limit, $page);
     }

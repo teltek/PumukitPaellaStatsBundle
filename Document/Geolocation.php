@@ -1,8 +1,8 @@
 <?php
+
 namespace Pumukit\PaellaStatsBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Validator\Constraints\False;
 
 /**
  * Pumukit\PaellaStatsBundle\Document\Geolocation.
@@ -11,29 +11,28 @@ use Symfony\Component\Validator\Constraints\False;
  */
 class Geolocation
 {
-
     /**
      * @var int
      *
      * @MongoDB\Id
      */
     private $id;
-   
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\String
      */
     private $continent;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\String
      */
     private $continentCode;
-    
-	/**
+
+    /**
      * @var string
      *
      * @MongoDB\String
@@ -46,7 +45,7 @@ class Geolocation
      * @MongoDB\String
      */
     private $countryCode;
-    
+
     /**
      * @var string
      *
@@ -82,17 +81,16 @@ class Geolocation
      */
     private $postal;
 
-	
     /**
      * Get id.
      *
-     * @return id $id
+     * @return int $id
      */
     public function getId()
     {
         return $this->id;
     }
-	
+
     /**
      * Set continent.
      *
@@ -103,10 +101,11 @@ class Geolocation
     public function setContinent($continent)
     {
         $this->continent = $continent;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get continent.
      *
      * @return string $continent
@@ -115,7 +114,7 @@ class Geolocation
     {
         return $this->continent;
     }
-    
+
     /**
      * Set continentCode.
      *
@@ -126,10 +125,11 @@ class Geolocation
     public function setContinentCode($continentCode)
     {
         $this->continentCode = $continentCode;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get continentCode.
      *
      * @return string $continentCode
@@ -138,8 +138,8 @@ class Geolocation
     {
         return $this->continentCode;
     }
-    
-	/**
+
+    /**
      * Set country.
      *
      * @param string $country
@@ -149,10 +149,11 @@ class Geolocation
     public function setCountry($country)
     {
         $this->country = $country;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get country.
      *
      * @return string $country
@@ -172,6 +173,7 @@ class Geolocation
     public function setCountryCode($countryCode)
     {
         $this->countryCode = $countryCode;
+
         return $this;
     }
 
@@ -185,7 +187,7 @@ class Geolocation
         return $this->countryCode;
     }
 
-	/**
+    /**
      * Set subCountry.
      *
      * @param string $subCountry
@@ -195,10 +197,11 @@ class Geolocation
     public function setSubCountry($subCountry)
     {
         $this->subCountry = $subCountry;
+
         return $this;
     }
-    
-	/**
+
+    /**
      * Get subCountry.
      *
      * @return int $subCountry
@@ -207,8 +210,8 @@ class Geolocation
     {
         return $this->subCountry;
     }
-	
-	/**
+
+    /**
      * Set subCountryCode.
      *
      * @param string $subCountryCode
@@ -218,10 +221,11 @@ class Geolocation
     public function setSubCountryCode($subCountryCode)
     {
         $this->subCountryCode = $subCountryCode;
+
         return $this;
     }
-	
-	/**
+
+    /**
      * Get subCountryCode.
      *
      * @return string $subCountryCode
@@ -230,8 +234,8 @@ class Geolocation
     {
         return $this->subCountryCode;
     }
-	
-	/**
+
+    /**
      * Set city.
      *
      * @param string $city
@@ -241,10 +245,11 @@ class Geolocation
     public function setCity($city)
     {
         $this->city = $city;
+
         return $this;
     }
-	
-	/**
+
+    /**
      * Get city.
      *
      * @return string $city
@@ -253,7 +258,7 @@ class Geolocation
     {
         return $this->city;
     }
-	
+
     /**
      * Set latitude.
      *
@@ -262,6 +267,7 @@ class Geolocation
     public function setLatitude($latitude = null)
     {
         $this->location['latitude'] = $latitude;
+
         return $this;
     }
 
@@ -273,6 +279,7 @@ class Geolocation
     public function setLongitude($longitude = null)
     {
         $this->location['longitude'] = $longitude;
+
         return $this;
     }
 
@@ -284,6 +291,7 @@ class Geolocation
     public function setTimeZone($timeZone = null)
     {
         $this->location['timeZone'] = $timeZone;
+
         return $this;
     }
 
@@ -327,9 +335,10 @@ class Geolocation
     public function setPostal($postal)
     {
         $this->postal = $postal;
+
         return $this;
     }
-    
+
     /**
      * Get postal.
      *
@@ -339,5 +348,4 @@ class Geolocation
     {
         return $this->postal;
     }
-
 }

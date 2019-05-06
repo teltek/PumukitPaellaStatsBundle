@@ -4,7 +4,6 @@ namespace Pumukit\PaellaStatsBundle\Services;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 class UserActionService
 {
@@ -23,16 +22,16 @@ class UserActionService
         $this->repoAudience = $this->dm->getRepository('PumukitPaellaStatsBundle:MultimediaObjectAudience');
     }
 
-
     /**
      * Return an array of most viewed Multimedia Objects as results from the criteria/options.
+     *
      * @param array $criteria
      * @param array $options
+     *
      * @return array
      */
     public function getMmobjsMostViewed(array $criteria = array(), array $options = array())
     {
-
         $ids = array();
 
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
@@ -43,22 +42,21 @@ class UserActionService
 
         $options = $this->parseOptions($options);
 
-	      $pipeline = array();
-	      $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
-	      $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+        $pipeline = array();
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+        $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
         $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'geolocation' => 1, 'multimediaObject' => 1, 'series' => 1));
         $pipeline[] = array('$group' => array(
-                                            "_id" => '$multimediaObject',
-                                            'session_list' => array('$addToSet' =>
-                                                  array(
+                                            '_id' => '$multimediaObject',
+                                            'session_list' => array('$addToSet' => array(
                                                         'session' => '$session',
                                                         'multimediaObject' => '$multimediaObject',
                                                         'date' => '$date',
                                                         'city' => '$geolocation.city',
-                                                        'userAgent' => '$userAgent'
-                                                      )
-                                                    )
-                                            )
+                                                        'userAgent' => '$userAgent',
+                                                      ),
+                                                    ),
+                                            ),
                             );
         $pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
         $pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
@@ -81,7 +79,7 @@ class UserActionService
 
         //Add mmobj with zero views
         if (count($aggregation) < $options['limit']) {
-            if (count($aggregation) == 0) {
+            if (0 == count($aggregation)) {
                 $max = min((1 + $options['page']) * $options['limit'], sizeof($mmobjIds));
                 for ($i = ($options['page'] * $options['limit']); $i < $max; ++$i) {
                     $multimediaObject = $this->repoMultimedia->find($mmobjIds[$i]);
@@ -91,35 +89,32 @@ class UserActionService
                         );
                     }
                 }
-			} else {
+            } else {
+                $max = min($options['limit'], $total / $options['limit'] - count($mostViewed));
 
-				$max = min($options['limit'], $total/$options['limit'] - count($mostViewed));
+                foreach ($mmobjIds as $element) {
+                    if (count($mostViewed) >= $max) {
+                        break;
+                    } elseif (!in_array($element, $ids)) {
+                        $multimediaObject = $this->repoMultimedia->find($element);
+                        if ($multimediaObject) {
+                            $mostViewed[] = array('mmobj' => $multimediaObject,
+                                                    'num_viewed' => 0,
+                            );
+                        }
+                    }
+                }
+            }
+        }
 
-				foreach ($mmobjIds as $element) {
-
-					if (count($mostViewed) >= $max) {
-						break;
-					} else if(!in_array($element, $ids)) {
-						$multimediaObject = $this->repoMultimedia->find($element);
-						if ($multimediaObject) {
-							$mostViewed[] = array(	'mmobj' => $multimediaObject,
-													'num_viewed' => 0,
-							);
-						}
-					}
-				}
-			}
-		}
         return array($mostViewed, $total);
     }
-
 
     /**
      * Returns an array of series viewed on the given range and its number of views on that range.
      */
     public function getSeriesMostViewed(array $criteria = array(), array $options = array())
     {
-
         $ids = array();
         $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
 
@@ -130,22 +125,21 @@ class UserActionService
 
         $options = $this->parseOptions($options);
 
-	      $pipeline = array();
+        $pipeline = array();
         $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
         $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
         $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'geolocation' => 1, 'multimediaObject' => 1, 'series' => 1));
         $pipeline[] = array('$group' => array(
-                                            "_id" => '$series',
-                                            'session_list' => array('$addToSet' =>
-                                                  array(
+                                            '_id' => '$series',
+                                            'session_list' => array('$addToSet' => array(
                                                         'session' => '$session',
                                                         'multimediaObject' => '$multimediaObject',
                                                         'date' => '$date',
                                                         'city' => '$geolocation.city',
-                                                        'userAgent' => '$userAgent'
-                                                      )
-                                                    )
-                                            )
+                                                        'userAgent' => '$userAgent',
+                                                      ),
+                                                    ),
+                                            ),
                             );
         $pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
         $pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
@@ -168,7 +162,7 @@ class UserActionService
 
         //Add series with zero views
         if (count($aggregation) < $options['limit']) {
-            if (count($aggregation) == 0) {
+            if (0 == count($aggregation)) {
                 $max = min((1 + $options['page']) * $options['limit'], sizeof($seriesIds));
                 for ($i = ($options['page'] * $options['limit']); $i < $max; ++$i) {
                     $series = $this->repoSeries->find($seriesIds[$i]);
@@ -178,35 +172,34 @@ class UserActionService
                         );
                     }
                 }
+            } else {
+                $max = min($options['limit'], $total / $options['limit'] - count($mostViewed));
 
-	           } else {
-
-        				$max = min($options['limit'], $total/$options['limit'] - count($mostViewed));
-
-        				foreach ($seriesIds as $element) {
-        					if (count($mostViewed) >= $max) {
-        						break;
-        					} else if(!in_array($element, $ids)) {
-        						$series = $this->repoSeries->find($element);
-        						if ($series) {
-        							$mostViewed[] = array(
+                foreach ($seriesIds as $element) {
+                    if (count($mostViewed) >= $max) {
+                        break;
+                    } elseif (!in_array($element, $ids)) {
+                        $series = $this->repoSeries->find($element);
+                        if ($series) {
+                            $mostViewed[] = array(
                                   'series' => $series,
-        													'num_viewed' => 0,
-        							);
-        						}
-        					}
-        				}
+                                                            'num_viewed' => 0,
+                                    );
+                        }
+                    }
+                }
             }
         }
 
         return array($mostViewed, $total);
     }
 
-
     /**
      * Return an array of Most Used Agents as result from the criteria/options.
+     *
      * @param array $criteria
      * @param array $options
+     *
      * @return array
      */
     public function getMostUsedAgents(array $criteria = array(), array $options = array())
@@ -218,127 +211,40 @@ class UserActionService
         $pipeline = array();
         $matchExtra = array();
 
-        if(isset($criteria['criteria_series'])) {
-
-            if(isset($criteria['criteria_series']['id'])) {
-
+        if (isset($criteria['criteria_series'])) {
+            if (isset($criteria['criteria_series']['id'])) {
                 $matchExtra['series'] = array('$in' => array(new \MongoId($criteria['criteria_series']['id'])));
-
-            } else if (isset($criteria['criteria_series']['$text']['$search'])) {
-
+            } elseif (isset($criteria['criteria_series']['$text']['$search'])) {
                 $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
                 $matchExtra['series'] = array('$in' => $seriesIds);
-
             }
-
-        } else if (isset($criteria['criteria_mmobj'])) {
-
-            if(isset($criteria['criteria_mmobj']['id'])) {
-
+        } elseif (isset($criteria['criteria_mmobj'])) {
+            if (isset($criteria['criteria_mmobj']['id'])) {
                 $matchExtra['multimediaObject'] = array('$in' => array(new \MongoId($criteria['criteria_mmobj']['id'])));
-
-            } else if (isset($criteria['criteria_mmobj']['$text']['$search'])) {
-
+            } elseif (isset($criteria['criteria_mmobj']['$text']['$search'])) {
                 $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
                 $matchExtra['multimediaObject'] = array('$in' => $objsIds);
-
             }
         }
 
-
-    		$pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
-    		$mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+        $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
 
         $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'geolocation' => 1, 'multimediaObject' => 1, 'series' => 1));
         $pipeline[] = array('$group' => array(
-                                            "_id" => '$userAgent',
-                                            'session_list' => array('$addToSet' =>
-                                                  array(
+                                            '_id' => '$userAgent',
+                                            'session_list' => array('$addToSet' => array(
                                                         'session' => '$session',
                                                         'multimediaObject' => '$multimediaObject',
                                                         'date' => '$date',
                                                         'city' => '$geolocation.city',
-                                                        'userAgent' => '$userAgent'
-                                                      )
-                                                    )
-                                            )
-                            );
-    		$pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
-    		$pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
-
-    		$aggregation = $viewsCollection->aggregate($pipeline);
-
-        $total = count($aggregation);
-        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
-
-        return array($aggregation, $total);
-    }
-
-
-    /**
-     * Return an array of Cities from which object multimedia are most visited from the criteria/options.
-     * @param array $criteria
-     * @param array $options
-     * @return array
-     */
-    public function getCityFromMostViewed (array $criteria = array(), array $options = array())
-    {
-
-		$viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
-
-        $options = $this->parseOptions($options);
-
-        $pipeline = array();
-        $matchExtra = array();
-
-        if(isset($criteria['criteria_series'])) {
-
-            if(isset($criteria['criteria_series']['id'])) {
-
-                $matchExtra['series'] = array('$in' => array(new \MongoId($criteria['criteria_series']['id'])));
-
-            } else if (isset($criteria['criteria_series']['$text']['$search'])) {
-
-                $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
-                $matchExtra['series'] = array('$in' => $seriesIds);
-
-            }
-
-        } else if (isset($criteria['criteria_mmobj'])) {
-
-            if(isset($criteria['criteria_mmobj']['id'])) {
-
-                $matchExtra['multimediaObject'] = array('$in' => array(new \MongoId($criteria['criteria_mmobj']['id'])));
-
-            } else if (isset($criteria['criteria_mmobj']['$text']['$search'])) {
-
-                $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
-                $matchExtra['multimediaObject'] = array('$in' => $objsIds);
-
-            }
-        }
-
-
-    		$pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
-    		$mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
-    		$pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'geolocation' => 1, 'multimediaObject' => 1, 'series' => 1));
-        $pipeline[] = array('$group' => array(
-                                            "_id" => array(
-                                              'city' => '$geolocation.city',
+                                                        'userAgent' => '$userAgent',
+                                                      ),
+                                                    ),
                                             ),
-                                            'session_list' => array('$addToSet' =>
-                                                  array(
-                                                        'session' => '$session',
-                                                        'multimediaObject' => '$multimediaObject',
-                                                        'date' => '$date',
-                                                        'city' => '$geolocation.city',
-                                                        'userAgent' => '$userAgent'
-                                                      )
-                                                    )
-                                            )
                             );
-    		$pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
-    		$pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
+        $pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
 
         $aggregation = $viewsCollection->aggregate($pipeline);
 
@@ -348,33 +254,91 @@ class UserActionService
         return array($aggregation, $total);
     }
 
+    /**
+     * Return an array of Cities from which object multimedia are most visited from the criteria/options.
+     *
+     * @param array $criteria
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getCityFromMostViewed(array $criteria = array(), array $options = array())
+    {
+        $viewsCollection = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+
+        $options = $this->parseOptions($options);
+
+        $pipeline = array();
+        $matchExtra = array();
+
+        if (isset($criteria['criteria_series'])) {
+            if (isset($criteria['criteria_series']['id'])) {
+                $matchExtra['series'] = array('$in' => array(new \MongoId($criteria['criteria_series']['id'])));
+            } elseif (isset($criteria['criteria_series']['$text']['$search'])) {
+                $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
+                $matchExtra['series'] = array('$in' => $seriesIds);
+            }
+        } elseif (isset($criteria['criteria_mmobj'])) {
+            if (isset($criteria['criteria_mmobj']['id'])) {
+                $matchExtra['multimediaObject'] = array('$in' => array(new \MongoId($criteria['criteria_mmobj']['id'])));
+            } elseif (isset($criteria['criteria_mmobj']['$text']['$search'])) {
+                $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
+                $matchExtra['multimediaObject'] = array('$in' => $objsIds);
+            }
+        }
+
+        $pipeline = $this->aggrPipeAddMatch($options['from_date'], $options['to_date'], $matchExtra);
+        $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
+        $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'userAgent' => 1, 'geolocation' => 1, 'multimediaObject' => 1, 'series' => 1));
+        $pipeline[] = array('$group' => array(
+                                            '_id' => array(
+                                              'city' => '$geolocation.city',
+                                            ),
+                                            'session_list' => array('$addToSet' => array(
+                                                        'session' => '$session',
+                                                        'multimediaObject' => '$multimediaObject',
+                                                        'date' => '$date',
+                                                        'city' => '$geolocation.city',
+                                                        'userAgent' => '$userAgent',
+                                                      ),
+                                                    ),
+                                            ),
+                            );
+        $pipeline[] = array('$project' => array('_id' => 1, 'num_viewed' => array('$size' => '$session_list')));
+        $pipeline[] = array('$sort' => array('num_viewed' => $options['sort']));
+
+        $aggregation = $viewsCollection->aggregate($pipeline);
+
+        $total = count($aggregation);
+        $aggregation = $this->getPagedAggregation($aggregation->toArray(), $options['page'], $options['limit']);
+
+        return array($aggregation, $total);
+    }
 
     /*
      * Process the data from the Mongo "UserAction" Document to generate the audience of the multimedia objects.
      * @return array
      */
-    public function processAudienceUserAction(){
-
+    public function processAudienceUserAction()
+    {
         $elemProcessed = array();
 
         $qb = $this->repo->createQueryBuilder();
         $mObjects = $qb->field('isProcessed')->equals(false)->getQuery()->execute();
 
         foreach ($mObjects as $mObject) {
-
             $id = $mObject->getId();
             $objectId = $mObject->getMultimediaObject();
-            $inPoint = (int)($mObject->getInPoint());
-            $outPoint = (int)($mObject->getOutPoint());
+            $inPoint = (int) ($mObject->getInPoint());
+            $outPoint = (int) ($mObject->getOutPoint());
 
             $elemProcessed[] = $objectId;
 
             $this->dm->persist($mObject);
 
-            for($i = $inPoint; $i < $outPoint; $i++){
-
+            for ($i = $inPoint; $i < $outPoint; ++$i) {
                 $process_qb = $this->repoAudience->createQueryBuilder();
-                $process_qb ->findAndUpdate()
+                $process_qb->findAndUpdate()
                             ->upsert(true)
                             ->field('multimediaObject')->equals($objectId)
                             ->field('audience.'.$i)->inc(1)
@@ -382,7 +346,7 @@ class UserActionService
             }
 
             $update_qb = $this->repo->createQueryBuilder();
-            $update_qb  ->findAndUpdate()
+            $update_qb->findAndUpdate()
                 ->field('_id')->equals($id)
                 ->field('isProcessed')->set(true)
                 ->getQuery()->execute();
@@ -392,7 +356,6 @@ class UserActionService
 
         return array(array_values(array_unique($elemProcessed)), sizeof($elemProcessed));
     }
-
 
     /*
      * Return the series of a given $multimediaObjectId
@@ -405,7 +368,6 @@ class UserActionService
 
         return $qb->distinct('series')->field('_id')->equals($multimediaObjectId)->getQuery()->getSingleResult();
     }
-
 
     /**
      * Returns an array of MongoIds from MultimediaObject repository as results from the criteria.
@@ -433,7 +395,6 @@ class UserActionService
         return $qb->distinct('_id')->getQuery()->execute()->toArray();
     }
 
-
     /**
      * Returns an array with the total number of views (all mmobjs) on a certain date range, grouped by hour/day/month/year.
      *
@@ -444,7 +405,6 @@ class UserActionService
     {
         return $this->getGroupedByAggrPipeline($options);
     }
-
 
     /**
      * Returns an aggregation pipeline array with all necessary data to form a num_views array grouped by hour/day/...
@@ -470,17 +430,16 @@ class UserActionService
         $mongoProjectDate = $this->getMongoProjectDateArray($options['group_by']);
         $pipeline[] = array('$project' => array('date' => $mongoProjectDate, 'session' => 1, 'multimediaObject' => 1, 'series' => 1, 'userAgent' => 1, 'geolocation' => 1));
         $pipeline[] = array('$group' => array(
-                                            "_id" => '$date',
-                                            'session_list' => array('$addToSet' =>
-                                                  array(
+                                            '_id' => '$date',
+                                            'session_list' => array('$addToSet' => array(
                                                         'session' => '$session',
                                                         'multimediaObject' => '$multimediaObject',
                                                         'date' => '$date',
                                                         'city' => '$geolocation.city',
-                                                        'userAgent' => '$userAgent'
-                                                      )
-                                                    )
-                                            )
+                                                        'userAgent' => '$userAgent',
+                                                      ),
+                                                    ),
+                                            ),
                             );
         $pipeline[] = array('$project' => array('_id' => 1, 'views' => array('$size' => '$session_list')));
         $pipeline[] = array('$group' => array('_id' => '$_id', 'num_viewed' => array('$sum' => '$views')));
@@ -493,7 +452,6 @@ class UserActionService
 
         return array($aggregation, $total);
     }
-
 
     /**
      * Returns a 'paged' result of the aggregation array.
@@ -552,7 +510,6 @@ class UserActionService
         return $pipeline;
     }
 
-
     /**
      * Returns an array for a mongo $project pipeline to create a date-formatted string with just the required fields.
      * It is used for grouping results in date ranges (hour/day/month/year).
@@ -565,13 +522,16 @@ class UserActionService
                 $mongoProjectDate[] = 'H';
                 $mongoProjectDate[] = array('$substr' => array($dateField, 0, 2));
                 $mongoProjectDate[] = 'T';
+                // no break
             case 'day':
                 $mongoProjectDate[] = array('$substr' => array($dateField, 8, 2));
                 $mongoProjectDate[] = '-';
+                // no break
             default: //If it doesn't exists, it's 'month'
             case 'month':
                 $mongoProjectDate[] = array('$substr' => array($dateField, 5, 2));
                 $mongoProjectDate[] = '-';
+                // no break
             case 'year':
                 $mongoProjectDate[] = array('$substr' => array($dateField, 0, 4));
                 break;
@@ -579,6 +539,4 @@ class UserActionService
 
         return array('$concat' => array_reverse($mongoProjectDate));
     }
-
-
 }

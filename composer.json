@@ -1,21 +1,21 @@
 {
-    "name": "teltek/pmk2-paella-stats-bundle",
+    "name": "teltek/pumukit-paella-stats-bundle",
     "description": "Stats for PuMuKIT and Paella",
     "type": "symfony-bundle",
     "keywords": [
         "stats",
-        "symfony2",
+        "symfony",
         "bundle",
         "pumukit",
         "paella"
     ],
     "require": {
-        "php": ">=5.5.9",
-        "teltek/pmk2-paella-player-bundle": ">=1.2",
-        "pumukit/pumukit2": ">=2.2",
+        "php": ">=7.2",
+        "teltek/pumukit-paella-player-bundle": ">=2.0",
+        "pumukit/pumukit": ">=3.0",
         "gpslab/geoip2": "^1.0"
     },
-    "homepage": "https://github.com/teltek/PuMuKIT2-paella-stats-bundle",
+    "homepage": "https://github.com/teltek/PumukitPaellaStatsBundle",
     "license": "proprietary",
     "authors": [
         {
