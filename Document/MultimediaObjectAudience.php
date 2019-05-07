@@ -35,7 +35,7 @@ class MultimediaObjectAudience
     /**
      * @var int
      *
-     * @MongoDB\Raw
+     * @MongoDB\Field(type="raw")
      */
     private $audience = array();
 
