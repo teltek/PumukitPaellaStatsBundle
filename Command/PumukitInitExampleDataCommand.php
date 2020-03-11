@@ -19,7 +19,8 @@ class PumukitInitExampleDataCommand extends ContainerAwareCommand
         $this
             ->setName('pumukit:init:paellastatsexample')
             ->setDescription('Load Pumukit example user actions data fixtures to your database')
-            ->setHelp(<<<'EOT'
+            ->setHelp(
+                <<<'EOT'
 				Command to load a data set of data into a database. Useful for init a demo Pumukit environment.
 EOT
             );

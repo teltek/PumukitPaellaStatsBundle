@@ -310,9 +310,9 @@ class APIController extends Controller
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
         /*
                 try {
-        
+
                     $record = $this->get('geoip2.reader')->city($ip);
-        
+
                     $userGeolocation = new Geolocation();
                     $userGeolocation->setContinent( $record->continent->name);
                     $userGeolocation->setContinentCode($record->continent->code);
@@ -325,9 +325,9 @@ class APIController extends Controller
                     $userGeolocation->setLongitude($record->location->longitude);
                     $userGeolocation->setTimeZone($record->location->timeZone);
                     $userGeolocation->setPostal($record->postal->code);
-        
+
                     $userAction->setGeolocation($userGeolocation);
-        
+
                 } catch (\Exception $e) {}
         */
 
