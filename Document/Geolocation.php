@@ -5,346 +5,193 @@ namespace Pumukit\PaellaStatsBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * Pumukit\PaellaStatsBundle\Document\Geolocation.
- *
  * @MongoDB\EmbeddedDocument
  */
 class Geolocation
 {
     /**
-     * @var int
-     *
      * @MongoDB\Id
      */
     private $id;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $continent;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $continentCode;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $country;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $countryCode;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $subCountry;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $subCountryCode;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $city;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="raw")
      */
-    private $location = array('latitude' => '', 'longitude' => '', 'timeZone' => '');
+    private $location = ['latitude' => '', 'longitude' => '', 'timeZone' => ''];
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $postal;
 
-    /**
-     * Get id.
-     *
-     * @return int $id
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Set continent.
-     *
-     * @param string $continent
-     *
-     * @return self
-     */
-    public function setContinent($continent)
+    public function setContinent(string $continent): self
     {
         $this->continent = $continent;
 
         return $this;
     }
 
-    /**
-     * Get continent.
-     *
-     * @return string $continent
-     */
-    public function getContinent()
+    public function getContinent(): string
     {
         return $this->continent;
     }
 
-    /**
-     * Set continentCode.
-     *
-     * @param string $continentCode
-     *
-     * @return self
-     */
-    public function setContinentCode($continentCode)
+    public function setContinentCode(string $continentCode): self
     {
         $this->continentCode = $continentCode;
 
         return $this;
     }
 
-    /**
-     * Get continentCode.
-     *
-     * @return string $continentCode
-     */
-    public function getContinentCode()
+    public function getContinentCode(): string
     {
         return $this->continentCode;
     }
 
-    /**
-     * Set country.
-     *
-     * @param string $country
-     *
-     * @return self
-     */
-    public function setCountry($country)
+    public function setCountry(string $country): self
     {
         $this->country = $country;
 
         return $this;
     }
 
-    /**
-     * Get country.
-     *
-     * @return string $country
-     */
-    public function getCountry()
+    public function getCountry(): string
     {
         return $this->country;
     }
 
-    /**
-     * Set countryCode.
-     *
-     * @param string $countryCode
-     *
-     * @return self
-     */
-    public function setCountryCode($countryCode)
+    public function setCountryCode(string $countryCode): self
     {
         $this->countryCode = $countryCode;
 
         return $this;
     }
 
-    /**
-     * Get countryCode.
-     *
-     * @return string $countryCode
-     */
-    public function getCountryCode()
+    public function getCountryCode(): string
     {
         return $this->countryCode;
     }
 
-    /**
-     * Set subCountry.
-     *
-     * @param string $subCountry
-     *
-     * @return self
-     */
-    public function setSubCountry($subCountry)
+    public function setSubCountry(string $subCountry): self
     {
         $this->subCountry = $subCountry;
 
         return $this;
     }
 
-    /**
-     * Get subCountry.
-     *
-     * @return int $subCountry
-     */
-    public function getSubCountry()
+    public function getSubCountry(): string
     {
         return $this->subCountry;
     }
 
-    /**
-     * Set subCountryCode.
-     *
-     * @param string $subCountryCode
-     *
-     * @return self
-     */
-    public function setSubCountryCode($subCountryCode)
+    public function setSubCountryCode(string $subCountryCode): self
     {
         $this->subCountryCode = $subCountryCode;
 
         return $this;
     }
 
-    /**
-     * Get subCountryCode.
-     *
-     * @return string $subCountryCode
-     */
-    public function getSubCountryCode()
+    public function getSubCountryCode(): string
     {
         return $this->subCountryCode;
     }
 
-    /**
-     * Set city.
-     *
-     * @param string $city
-     *
-     * @return self
-     */
-    public function setCity($city)
+    public function setCity(string $city): self
     {
         $this->city = $city;
 
         return $this;
     }
 
-    /**
-     * Get city.
-     *
-     * @return string $city
-     */
-    public function getCity()
+    public function getCity(): self
     {
         return $this->city;
     }
 
-    /**
-     * Set latitude.
-     *
-     * @param string|null $latitude
-     */
-    public function setLatitude($latitude = null)
+    public function setLatitude(?string $latitude = null): self
     {
         $this->location['latitude'] = $latitude;
 
         return $this;
     }
 
-    /**
-     * Set longitude.
-     *
-     * @param string|null $longitude
-     */
-    public function setLongitude($longitude = null)
+    public function setLongitude(?string $longitude = null): self
     {
         $this->location['longitude'] = $longitude;
 
         return $this;
     }
 
-    /**
-     * Set timeZone.
-     *
-     * @param string|null $timeZone
-     */
-    public function setTimeZone($timeZone = null)
+    public function setTimeZone(?string $timeZone = null): self
     {
         $this->location['timeZone'] = $timeZone;
 
         return $this;
     }
 
-    /**
-     * Get latitude.
-     *
-     * @param string|null $latitude
-     */
-    public function getLatitude($latitude = null)
+    public function getLatitude(): string
     {
         return $this->location['latitude'];
     }
 
-    /**
-     * Get longitude.
-     *
-     * @param string|null $longitude
-     */
-    public function getLongitude($longitude = null)
+    public function getLongitude(): string
     {
         return $this->location['longitude'];
     }
 
-    /**
-     * Get timeZone.
-     *
-     * @param string|null $timeZone
-     */
-    public function getTimeZone($timeZone = null)
+    public function getTimeZone(): string
     {
         return $this->location['timeZone'];
     }
 
-    /**
-     * Set postal.
-     *
-     * @param string $postal
-     *
-     * @return self
-     */
-    public function setPostal($postal)
+    public function setPostal(string $postal): self
     {
         $this->postal = $postal;
 
         return $this;
     }
 
-    /**
-     * Get postal.
-     *
-     * @return string $postal
-     */
-    public function getPostal()
+    public function getPostal(): string
     {
         return $this->postal;
     }
