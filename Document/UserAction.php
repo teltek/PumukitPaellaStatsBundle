@@ -5,100 +5,72 @@ namespace Pumukit\PaellaStatsBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * Pumukit\PaellaStatsBundle\Document\UserAction.
- *
  * @MongoDB\Document(repositoryClass="Pumukit\PaellaStatsBundle\Repository\UserActionRepository")
  */
 class UserAction
 {
     /**
-     * @var int
-     *
      * @MongoDB\Id
      */
     private $id;
 
     /**
-     * @var \DateTime
-     *
-     * @MongoDB\Date
+     * @MongoDB\Field(type="date")
      */
     private $date;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $ip;
 
     /**
-     * @var string
-     *
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     private $user;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $session;
 
     /**
-     * @var string
-     *
      * @MongoDB\Field(type="string")
      */
     private $userAgent;
 
     /**
-     * @var string
-     *
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     private $multimediaObject;
 
     /**
-     * @var string
-     *
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     private $series;
 
     /**
-     * @var int
-     *
      * @MongoDB\Field(type="int")
      */
     private $inPoint;
 
     /**
-     * @var int
-     *
      * @MongoDB\Field(type="int")
      */
     private $outPoint;
 
     /**
-     * @var bool
-     *
-     * @MongoDB\Boolean
+     * @MongoDB\Field(type="bool")
      */
     private $isLive;
 
     /**
-     * @var Geolocation
-     *
      * @MongoDB\EmbedOne(targetDocument="Geolocation")
      */
     private $geolocation;
 
     /**
-     * @var bool
-     *
-     * @MongoDB\Boolean
+     * @MongoDB\Field(type="bool")
      */
     private $isProcessed;
 
@@ -117,296 +89,151 @@ class UserAction
         $this->isProcessed = false;
     }
 
-    /**
-     * Get id.
-     *
-     * @return int $id
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Set date.
-     *
-     * @param \DateTime $date
-     *
-     * @return self
-     */
-    public function setDate($date)
+    public function setDate(\DateTime $date): self
     {
         $this->date = $date;
 
         return $this;
     }
 
-    /**
-     * Get date.
-     *
-     * @return \DateTime $date
-     */
-    public function getDate()
+    public function getDate(): \DateTime
     {
         return $this->date;
     }
 
-    /**
-     * Set ip.
-     *
-     * @param string $ip
-     *
-     * @return self
-     */
-    public function setIp($ip)
+    public function setIp(string $ip): self
     {
         $this->ip = $ip;
 
         return $this;
     }
 
-    /**
-     * Get ip.
-     *
-     * @return string $ip
-     */
-    public function getIp()
+    public function getIp(): string
     {
         return $this->ip;
     }
 
-    /**
-     * Set session.
-     *
-     * @param string $session
-     *
-     * @return self
-     */
-    public function setSession($session)
+    public function setSession(string $session): self
     {
         $this->session = $session;
 
         return $this;
     }
 
-    /**
-     * Get session.
-     *
-     * @return string $session
-     */
-    public function getSession()
+    public function getSession(): string
     {
         return $this->session;
     }
 
-    /**
-     * Set userAgent.
-     *
-     * @param string $userAgent
-     *
-     * @return self
-     */
-    public function setUserAgent($userAgent)
+    public function setUserAgent(string $userAgent): self
     {
         $this->userAgent = $userAgent;
 
         return $this;
     }
 
-    /**
-     * Get session.
-     *
-     * @return string $userAgent
-     */
-    public function getUserAgent()
+    public function getUserAgent(): string
     {
         return $this->userAgent;
     }
 
-    /**
-     * Set multimediaObject.
-     *
-     * @param string $multimediaObject
-     *
-     * @return self
-     */
-    public function setMultimediaObject($multimediaObject)
+    public function setMultimediaObject($multimediaObject): self
     {
         $this->multimediaObject = $multimediaObject;
 
         return $this;
     }
 
-    /**
-     * Get multimediaObject.
-     *
-     * @return string $multimediaObject
-     */
     public function getMultimediaObject()
     {
         return $this->multimediaObject;
     }
 
-    /**
-     * Set series.
-     *
-     * @param string $series
-     *
-     * @return self
-     */
-    public function setSerie($series)
+    public function setSerie($series): self
     {
         $this->series = $series;
 
         return $this;
     }
 
-    /**
-     * Get series.
-     *
-     * @return string $series
-     */
     public function getSerie()
     {
         return $this->series;
     }
 
-    /**
-     * Set inPoint.
-     *
-     * @param int $inPoint
-     *
-     * @return self
-     */
-    public function setInPoint($inPoint)
+    public function setInPoint(int $inPoint): self
     {
         $this->inPoint = $inPoint;
 
         return $this;
     }
 
-    /**
-     * Get inPoint.
-     *
-     * @return int $inPoint
-     */
-    public function getInPoint()
+    public function getInPoint(): int
     {
         return $this->inPoint;
     }
 
-    /**
-     * Set outPoint.
-     *
-     * @param int $outPoint
-     *
-     * @return self
-     */
-    public function setOutPoint($outPoint)
+    public function setOutPoint(int $outPoint): self
     {
         $this->outPoint = $outPoint;
 
         return $this;
     }
 
-    /**
-     * Get outPoint.
-     *
-     * @return int $outPoint
-     */
-    public function getOutPoint()
+    public function getOutPoint(): int
     {
         return $this->outPoint;
     }
 
-    /**
-     * Set isLive.
-     *
-     * @param bool $isLive
-     *
-     * @return self
-     */
-    public function setIsLive($isLive)
+    public function setIsLive(bool $isLive): self
     {
         $this->isLive = $isLive;
 
         return $this;
     }
 
-    /**
-     * Get isLive.
-     *
-     * @return bool $isLive
-     */
-    public function getIsLive()
+    public function getIsLive(): bool
     {
         return $this->isLive;
     }
 
-    /**
-     * Set user.
-     *
-     * @param string $user
-     *
-     * @return self
-     */
-    public function setUser($user)
+    public function setUser($user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    /**
-     * Get user.
-     *
-     * @return string $user
-     */
     public function getUser()
     {
         return $this->user;
     }
 
-    /**
-     * Set geolocation.
-     *
-     * @param Geolocation $geolocation
-     */
-    public function setGeolocation(Geolocation $geolocation)
+    public function setGeolocation(Geolocation $geolocation): self
     {
         $this->geolocation = $geolocation;
 
         return $this;
     }
 
-    /**
-     * Get geolocation.
-     *
-     * @return Geolocation $geolocation
-     */
-    public function getGeolocation()
+    public function getGeolocation(): Geolocation
     {
         return $this->geolocation;
     }
 
-    /**
-     * Set isProcessed.
-     *
-     * @param bool $isProcessed
-     */
-    public function setIsProcessed($isProcessed)
+    public function setIsProcessed(bool $isProcessed): self
     {
         $this->isProcessed = $isProcessed;
 
         return $this;
     }
 
-    /**
-     * Get isProcessed.
-     *
-     * @return bool $isProcessed
-     */
-    public function getIsProcessed()
+    public function getIsProcessed(): bool
     {
         return $this->isProcessed;
     }

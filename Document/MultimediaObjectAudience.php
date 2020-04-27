@@ -5,126 +5,74 @@ namespace Pumukit\PaellaStatsBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * Pumukit\PaellaStatsBundle\Document\MultimediaObjectAudience.
- *
  * @MongoDB\Document(repositoryClass="Pumukit\PaellaStatsBundle\Repository\MultimediaObjectAudienceRepository")
  */
 class MultimediaObjectAudience
 {
     /**
-     * @var int
-     *
      * @MongoDB\Id
      */
     private $id;
 
     /**
-     * @var \DateTime
-     *
-     * @MongoDB\Date
+     * @MongoDB\Field(type="date")
      */
     private $lastUpdate;
 
     /**
-     * @var string
-     *
-     * @MongoDB\ObjectId
+     * @MongoDB\Field(type="object_id")
      */
     private $multimediaObject;
 
     /**
-     * @var int
-     *
      * @MongoDB\Field(type="raw")
      */
-    private $audience = array();
+    private $audience = [];
 
-    public function __construct($multimediaObject, $audience = array())
+    public function __construct($multimediaObject, $audience = [])
     {
         $this->lastUpdate = new \DateTime('now');
         $this->multimediaObject = $multimediaObject;
         $this->audience = $audience;
     }
 
-    /**
-     * Get id.
-     *
-     * @return int $id
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Set lastUpdate.
-     *
-     * @param \DateTime $lastUpdate
-     *
-     * @return self
-     */
-    public function setLastUpdate($lastUpdate)
+    public function setLastUpdate(\DateTime $lastUpdate): self
     {
         $this->lastUpdate = $lastUpdate;
 
         return $this;
     }
 
-    /**
-     * Get lastUpdate.
-     *
-     * @return \DateTime $lastUpdate
-     */
-    public function getLastUpdate()
+    public function getLastUpdate(): \DateTime
     {
         return $this->lastUpdate;
     }
 
-    /**
-     * Set multimediaObject.
-     *
-     * @param string $multimediaObject
-     *
-     * @return self
-     */
-    public function setMultimediaObject($multimediaObject)
+    public function setMultimediaObject($multimediaObject): self
     {
         $this->multimediaObject = $multimediaObject;
 
         return $this;
     }
 
-    /**
-     * Get multimediaObject.
-     *
-     * @return int $multimediaObject
-     */
     public function getMultimediaObject()
     {
         return $this->multimediaObject;
     }
 
-    /**
-     * Set audience.
-     *
-     * @param int|null $second
-     * @param int      $times
-     */
-    public function setAudience($second = null, $times = 0)
+    public function setAudience(?int $second = null, int $times = 0): void
     {
         $this->audience[$second] = $times;
     }
 
-    /**
-     * Get audience.
-     *
-     * @param int|null $second
-     *
-     * @return int
-     */
-    public function getAudience($second = null)
+    public function getAudience(?int $second = null): int
     {
-        if (null == $second) {
+        if (null === $second) {
             return 0;
         }
 
