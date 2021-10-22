@@ -1,21 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pumukit\PaellaStatsBundle\Controller;
 
 use Pumukit\PaellaStatsBundle\Document\UserAction;
+use Pumukit\PaellaStatsBundle\Services\UserActionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * @Route("/paella")
  */
-class APIController extends Controller
+class APIController extends AbstractController
 {
+    private $documentManager;
+    private $userActionService;
+
+    public function __construct(DocumentManager $documentManager, UserActionService $userActionService)
+    {
+        $this->documentManager = $documentManager;
+        $this->userActionService = $userActionService;
+    }
+
     /**
      * @Route("/save_single/{videoID}", requirements={"in": "\d+", "out": "\d+"})
      * @Security("is_granted('IS_AUTHENTICATED_ANONYMOUSLY')")
@@ -58,10 +69,8 @@ class APIController extends Controller
         );
     }
 
-    private function saveAction(Request $request, $multimediaObject, $in, $out)
+    private function saveAction(Request $request, $multimediaObject, $in, $out): void
     {
-        $viewsService = $this->get('pumukit_paella_stats.stats');
-
         $ip = $request->getClientIp();
         $userAgent = $request->server->get('HTTP_USER_AGENT');
         $user = ($this->getUser()) ? $this->getUser()->getId() : null;
@@ -69,11 +78,11 @@ class APIController extends Controller
         $session = $session->getId();
         $isLive = json_decode($request->get('isLive'));
 
-        $series = $viewsService->getSerieFromVideo($multimediaObject);
+        $series = $this->userActionService->getSerieFromVideo($multimediaObject);
 
         $userAction = new UserAction($ip, $session, $userAgent, $multimediaObject, $series, $in, $out, $isLive, $user);
-        $dm = $this->get('doctrine_mongodb')->getManager();
-        $dm->persist($userAction);
-        $dm->flush();
+
+        $this->documentManager->persist($userAction);
+        $this->documentManager->flush();
     }
 }

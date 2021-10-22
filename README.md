@@ -15,36 +15,20 @@ Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
 ```bash
-$ composer require teltek/pumukit-paella-stats-bundle 2.0.x-dev
+$ composer require teltek/pumukit-paella-stats-bundle dev-master
 ```
 
 ### Step 2: Install the Bundle
 
-Add the following line on AppKernel.php
+Add the following line on bundles.php
 
 ```
-public function registerBundles()
-{
-    return array(
-        // ...
-        new Pumukit\PaellaStatsBundle\PumukitPaellaStatsBundle()
-        new GpsLab\Bundle\GeoIP2Bundle\GpsLabGeoIP2Bundle(),
-        // ...
-    );
-}
-```
 
-Add the following lines on routing.yml
-
-```bash
-pumukit_paella_stats:
-    resource: "@PumukitPaellaStatsBundle/Resources/config/routing.yml"
-    prefix:   /
 ```
 
 ### Step 3: Configure the bundle
 
-PaellaStats have a hard dependency of [bundle for the Maxmind GeoIP2 API](https://github.com/gpslab/geoip2). It's a composer requiement, and you need
+PaellaStats have a hard dependency of [bundle for the Maxmind GeoIP2 API](https://github.com/gpslab/geoip2). It's a composer requirement, and you need
 configure it to use.
 ```
 gpslab_geoip:
@@ -64,13 +48,13 @@ gpslab_geoip:
 ### Step 4: Update assets
 
 ```bash
-$ php app/console cache:clear
-$ php app/console cache:clear --env=prod
-$ php app/console assets:install
+$ php bin/console cache:clear
+$ php bin/console cache:clear --env=prod
+$ php bin/console assets:install
 ```
 
 ### OPTIONAL: Load example statistics data
 
 ```bash
-    php app/console pumukit:init:paellastatsexample
+php bin/console pumukit:paella:stats:init:example
 ```

@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire:      true
+    autoconfigure: true
+    public:        true
+
+  Pumukit\PaellaStatsBundle\Controller\:
+    resource: '../../Controller'
+    tags: ['controller.service_arguments']
+
+  Pumukit\PaellaStatsBundle\Command\:
+    resource: '../../Command'
+    tags: ['console.command']
+
+  Pumukit\PaellaStatsBundle\Services\UserActionService:
+    class: Pumukit\PaellaStatsBundle\Services\UserActionService
