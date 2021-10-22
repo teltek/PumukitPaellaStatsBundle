@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pumukit\PaellaStatsBundle\Controller;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
 use Pumukit\PaellaStatsBundle\Services\UserActionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;

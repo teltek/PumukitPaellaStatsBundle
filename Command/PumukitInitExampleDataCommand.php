@@ -19,6 +19,7 @@ class PumukitInitExampleDataCommand extends Command
     public function __construct(DocumentManager $documentManager)
     {
         $this->documentManager = $documentManager;
+        parent::__construct();
     }
 
     protected function configure(): void
