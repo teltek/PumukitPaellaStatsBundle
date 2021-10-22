@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pumukit\PaellaStatsBundle\Services;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -10,7 +12,7 @@ use Pumukit\SchemaBundle\Document\Series;
 
 class UserActionService
 {
-    private $dm;
+    private $documentManager;
     private $repo;
     private $repoMultimedia;
     private $repoSeries;
@@ -18,11 +20,11 @@ class UserActionService
 
     public function __construct(DocumentManager $documentManager)
     {
-        $this->dm = $documentManager;
-        $this->repo = $this->dm->getRepository(UserAction::class);
-        $this->repoMultimedia = $this->dm->getRepository(MultimediaObject::class);
-        $this->repoSeries = $this->dm->getRepository(Series::class);
-        $this->repoAudience = $this->dm->getRepository(MultimediaObjectAudience::class);
+        $this->documentManager = $documentManager;
+        $this->repo = $this->documentManager->getRepository(UserAction::class);
+        $this->repoMultimedia = $this->documentManager->getRepository(MultimediaObject::class);
+        $this->repoSeries = $this->documentManager->getRepository(Series::class);
+        $this->repoAudience = $this->documentManager->getRepository(MultimediaObjectAudience::class);
     }
 
     /**
@@ -32,7 +34,7 @@ class UserActionService
     {
         $ids = [];
 
-        $viewsCollection = $this->dm->getDocumentCollection(UserAction::class);
+        $viewsCollection = $this->documentManager->getDocumentCollection(UserAction::class);
 
         $matchExtra = [];
         $mmobjIds = $this->getMmobjIdsWithCriteria($criteria);
@@ -120,7 +122,7 @@ class UserActionService
     public function getSeriesMostViewed(array $criteria = [], array $options = []): array
     {
         $ids = [];
-        $viewsCollection = $this->dm->getDocumentCollection(UserAction::class);
+        $viewsCollection = $this->documentManager->getDocumentCollection(UserAction::class);
 
         $matchExtra = [];
 
@@ -202,7 +204,7 @@ class UserActionService
      */
     public function getMostUsedAgents(array $criteria = [], array $options = []): array
     {
-        $viewsCollection = $this->dm->getDocumentCollection(UserAction::class);
+        $viewsCollection = $this->documentManager->getDocumentCollection(UserAction::class);
 
         $options = $this->parseOptions($options);
 
@@ -256,7 +258,7 @@ class UserActionService
      */
     public function getCityFromMostViewed(array $criteria = [], array $options = []): array
     {
-        $viewsCollection = $this->dm->getDocumentCollection(UserAction::class);
+        $viewsCollection = $this->documentManager->getDocumentCollection(UserAction::class);
 
         $options = $this->parseOptions($options);
 
@@ -324,7 +326,7 @@ class UserActionService
 
             $elemProcessed[] = $objectId;
 
-            $this->dm->persist($mObject);
+            $this->documentManager->persist($mObject);
 
             for ($i = $inPoint; $i < $outPoint; ++$i) {
                 $process_qb = $this->repoAudience->createQueryBuilder();
@@ -342,7 +344,7 @@ class UserActionService
                 ->getQuery()->execute();
         }
 
-        $this->dm->flush();
+        $this->documentManager->flush();
 
         return [array_values(array_unique($elemProcessed)), \count($elemProcessed)];
     }
@@ -377,7 +379,7 @@ class UserActionService
      */
     public function getGroupedByAggrPipeline(array $options = [], $matchExtra = []): array
     {
-        $viewsLogColl = $this->dm->getDocumentCollection('PumukitPaellaStatsBundle:UserAction');
+        $viewsLogColl = $this->documentManager->getDocumentCollection(UserAction::class);
         $options = $this->parseOptions($options);
 
         if (!$matchExtra) {
@@ -508,6 +510,7 @@ class UserActionService
     private function getMongoProjectDateArray(string $groupBy, $dateField = '$date'): array
     {
         $mongoProjectDate = [];
+
         switch ($groupBy) {
             case 'hour':
                 $mongoProjectDate[] = 'H';

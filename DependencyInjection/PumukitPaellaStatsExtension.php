@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pumukit\PaellaStatsBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
@@ -11,7 +13,7 @@ class PumukitPaellaStatsExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('pumukit_paella_stats.yaml');
     }
 }

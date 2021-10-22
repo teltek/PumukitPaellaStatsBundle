@@ -1,23 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pumukit\PaellaStatsBundle\Command;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PumukitInitExampleDataCommand extends ContainerAwareCommand
+class PumukitInitExampleDataCommand extends Command
 {
-    private $dm;
+    private $documentManager;
+
+    public function __construct(DocumentManager $documentManager)
+    {
+        $this->documentManager = $documentManager;
+    }
 
     protected function configure(): void
     {
         $this
-            ->setName('pumukit:init:paellastatsexample')
+            ->setName('pumukit:paella:stats:init:example')
             ->setDescription('Load PuMuKIT example user actions data fixtures to your database')
             ->setHelp(
                 <<<'EOT'
@@ -27,14 +34,9 @@ EOT
         ;
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output): void
-    {
-        $this->dm = $this->getContainer()->get('doctrine_mongodb.odm.document_manager');
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->loadUserAction($this->dm, $output);
+        $this->loadUserAction($output);
 
         $output->writeln('');
         $output->writeln('<info>Example data load successful</info>');
@@ -42,10 +44,10 @@ EOT
         return 0;
     }
 
-    private function loadUserAction(DocumentManager $dm, $output)
+    private function loadUserAction($output): void
     {
-        $mmobjRepo = $dm->getRepository(MultimediaObject::class);
-        $userActionColl = $dm->getDocumentCollection(UserAction::class);
+        $mmobjRepo = $this->documentManager->getRepository(MultimediaObject::class);
+        $userActionColl = $this->documentManager->getDocumentCollection(UserAction::class);
 
         $allMmobjs = $mmobjRepo->findStandardBy([]);
         $useragents = ['Mozilla/5.0 PuMuKIT/2.2 (UserAgent Example Data.) Gecko/20100101 Firefox/40.1',
@@ -99,12 +101,12 @@ EOT
                     'isProcessed' => false,
                 ];
                 $mmobj->incNumview();
-                $dm->persist($mmobj);
+                $this->documentManager->persist($mmobj);
             }
         }
         $progress->setProgress(count($allMmobjs));
         $userActionColl->batchInsert($logs);
-        $dm->flush();
+        $this->documentManager->flush();
         $progress->finish();
     }
 }
