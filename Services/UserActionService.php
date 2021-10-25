@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pumukit\PaellaStatsBundle\Services;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\BSON\ObjectId;
 use Pumukit\PaellaStatsBundle\Document\MultimediaObjectAudience;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
@@ -212,14 +213,14 @@ class UserActionService
 
         if (isset($criteria['criteria_series'])) {
             if (isset($criteria['criteria_series']['id'])) {
-                $matchExtra['series'] = ['$in' => [new \MongoId($criteria['criteria_series']['id'])]];
+                $matchExtra['series'] = ['$in' => [new ObjectId($criteria['criteria_series']['id'])]];
             } elseif (isset($criteria['criteria_series']['$text']['$search'])) {
                 $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
                 $matchExtra['series'] = ['$in' => $seriesIds];
             }
         } elseif (isset($criteria['criteria_mmobj'])) {
             if (isset($criteria['criteria_mmobj']['id'])) {
-                $matchExtra['multimediaObject'] = ['$in' => [new \MongoId($criteria['criteria_mmobj']['id'])]];
+                $matchExtra['multimediaObject'] = ['$in' => [new ObjectId($criteria['criteria_mmobj']['id'])]];
             } elseif (isset($criteria['criteria_mmobj']['$text']['$search'])) {
                 $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
                 $matchExtra['multimediaObject'] = ['$in' => $objsIds];
@@ -266,14 +267,14 @@ class UserActionService
 
         if (isset($criteria['criteria_series'])) {
             if (isset($criteria['criteria_series']['id'])) {
-                $matchExtra['series'] = ['$in' => [new \MongoId($criteria['criteria_series']['id'])]];
+                $matchExtra['series'] = ['$in' => [new ObjectId($criteria['criteria_series']['id'])]];
             } elseif (isset($criteria['criteria_series']['$text']['$search'])) {
                 $seriesIds = $this->getSeriesIdsWithCriteria($criteria['criteria_series']);
                 $matchExtra['series'] = ['$in' => $seriesIds];
             }
         } elseif (isset($criteria['criteria_mmobj'])) {
             if (isset($criteria['criteria_mmobj']['id'])) {
-                $matchExtra['multimediaObject'] = ['$in' => [new \MongoId($criteria['criteria_mmobj']['id'])]];
+                $matchExtra['multimediaObject'] = ['$in' => [new ObjectId($criteria['criteria_mmobj']['id'])]];
             } elseif (isset($criteria['criteria_mmobj']['$text']['$search'])) {
                 $objsIds = $this->getMmobjIdsWithCriteria($criteria['criteria_mmobj']);
                 $matchExtra['multimediaObject'] = ['$in' => $objsIds];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pumukit\PaellaStatsBundle\Command;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\BSON\ObjectId;
 use Pumukit\PaellaStatsBundle\Document\UserAction;
 use Pumukit\SchemaBundle\Document\MultimediaObject;
 use Symfony\Component\Console\Command\Command;
@@ -94,8 +95,8 @@ EOT
                     'user' => null,
                     'session' => $session,
                     'userAgent' => $useragent,
-                    'multimediaObject' => new \MongoId($mmobj->getId()),
-                    'series' => new \MongoId($mmobj->getSeries()->getId()),
+                    'multimediaObject' => new ObjectId($mmobj->getId()),
+                    'series' => new ObjectId($mmobj->getSeries()->getId()),
                     'inPoint' => $in,
                     'outPoint' => $out,
                     'isLive' => false,
