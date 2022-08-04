@@ -12,7 +12,7 @@
     "require": {
         "php": ">=7.2",
         "pumukit/pumukit": "^4.0",
-        "teltek/pumukit-paella-player-bundle": "dev-master",
+        "teltek/pumukit-paella-player-bundle": "^3.0",
         "gpslab/geoip2": "^1.0",
         "ext-json": "*"
     },
